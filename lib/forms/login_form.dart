@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:life_moment/views/signup_view.dart';
+import 'package:life_moment/views/main_view.dart';
 
 class LoginForm extends StatefulWidget {
 
@@ -19,14 +21,26 @@ class _LoginFormState extends State<LoginForm> {
 
 
 
-  _onLoginPress() {
+  _onLoginPressed() {
 
     debugPrint('Login is pressed');
     if (_formKey.currentState.validate()){
       debugPrint('[Login Form] Local form field check passed');
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => MainView())
+      );
     }
   }
 
+  _onSignUpPressed(){
+
+    Navigator.push(
+      context, 
+      MaterialPageRoute(builder: (context) => SignUpView())
+    );
+  }
 
 
   @override
@@ -63,7 +77,7 @@ class _LoginFormState extends State<LoginForm> {
               // Password field
               controller: _passwordFieldController,
               decoration: const InputDecoration(
-                icon: Icon(Icons.person),
+                icon: Icon(Icons.vpn_key),
                 labelText: 'Password',
 
               ),
@@ -72,15 +86,31 @@ class _LoginFormState extends State<LoginForm> {
                 if (value.isEmpty){
                   return 'Please fill in this field';
                 }
-              }
+              },
+              obscureText: true,
             ),
 
-            RaisedButton(
-              
-              child: Text('Login'),
-              onPressed: () => _onLoginPress(),
 
-            )
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+
+                RaisedButton(
+                  child: Text('Login'),
+                  onPressed: () => _onLoginPressed(),
+                ),
+
+                RaisedButton(
+                  child: Text('Sign Up'),
+                  onPressed: () => _onSignUpPressed(),
+                )
+              ],
+
+            ),
+
+
+
           ]
       )
       

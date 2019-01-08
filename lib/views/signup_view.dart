@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:life_moment/forms/login_form.dart';
+import 'package:life_moment/forms/signup_form.dart';
 
-class LoginView extends StatefulWidget {
+class SignUpView extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return new _LoginViewState();
+    return new _SignUpViewState();
   }
 }
 
 
 
-class _LoginViewState extends State<LoginView> {
+class _SignUpViewState extends State<SignUpView> {
+
 
 
   @override
@@ -19,8 +20,7 @@ class _LoginViewState extends State<LoginView> {
     return Scaffold(
 
       appBar: AppBar(
-        title: Text('Login'),
-
+        title: Text('Sign Up'),
       ),
       body: Center(
         child: Column(
@@ -30,7 +30,7 @@ class _LoginViewState extends State<LoginView> {
 
             Container(
               margin: EdgeInsets.symmetric(horizontal: 30.0),
-              child: LoginForm(),
+              child: SignUpForm(),
               
               )
           ]

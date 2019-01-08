@@ -20,7 +20,7 @@ class _SignUpFormState extends State<SignUpForm> {
   final _emailFieldController = TextEditingController();
 
 
-  _onSignUpPress() {
+  _onSignUpPressed() {
 
     debugPrint('Sign Up is pressed');
     if (_formKey.currentState.validate()){
@@ -64,7 +64,7 @@ class _SignUpFormState extends State<SignUpForm> {
               // Password field
               controller: _passwordFieldController,
               decoration: const InputDecoration(
-                icon: Icon(Icons.person),
+                icon: Icon(Icons.vpn_key),
                 labelText: 'Password',
 
               ),
@@ -80,7 +80,7 @@ class _SignUpFormState extends State<SignUpForm> {
               // Password field
               controller: _nicknameFieldController,
               decoration: const InputDecoration(
-                icon: Icon(Icons.person),
+                icon: Icon(Icons.face),
                 labelText: 'Nickname',
 
               ),
@@ -96,7 +96,7 @@ class _SignUpFormState extends State<SignUpForm> {
               // Password field
               controller: _emailFieldController,
               decoration: const InputDecoration(
-                icon: Icon(Icons.person),
+                icon: Icon(Icons.email),
                 labelText: 'Email',
 
               ),
@@ -111,7 +111,7 @@ class _SignUpFormState extends State<SignUpForm> {
             RaisedButton(
               
               child: Text('Sign Up'),
-              onPressed: () => _onSignUpPress(),
+              onPressed: () => _onSignUpPressed(),
 
             )
           ]
@@ -123,7 +123,10 @@ class _SignUpFormState extends State<SignUpForm> {
   void dispose(){
 
     // Clean up the text edit controller here:
-
+    _loginIdFieldController.dispose();
+    _passwordFieldController.dispose();
+    _emailFieldController.dispose();
+    _nicknameFieldController.dispose();
 
     super.dispose();
   } 
