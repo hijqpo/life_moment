@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:life_moment/state.dart';
+import 'dart:async';
 
 // Views
 import 'package:life_moment/views/home_view.dart';
@@ -33,7 +34,7 @@ class MainViewState extends State<MainView> {
     GlobalState.mainViewState = this;
   }
 
-  static int _defaultIndex = 0;
+  static int _defaultIndex = 1;
 
   String _title = Titles[_defaultIndex];
   int _selectedIndex = _defaultIndex;
@@ -176,7 +177,7 @@ class MainViewState extends State<MainView> {
 
         ),
       ),
-      body: Center(-
+      body: Center(
         child: _widgetOptions.elementAt(_selectedIndex)
       ),
       bottomNavigationBar: Theme(
