@@ -1,3 +1,4 @@
+import 'package:life_moment/forms/login_form.dart';
 import 'package:life_moment/views/main_view.dart';
 
 
@@ -11,6 +12,14 @@ enum Mood {
 
 
 class GlobalState {
+
+  // System state
+  
+
+  static LoginForm loginForm;
+
+
+
 
   static Mood _currentMood = Mood.Normal;
 

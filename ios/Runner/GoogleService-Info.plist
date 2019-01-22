@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>AD_UNIT_ID_FOR_BANNER_TEST</key>
+	<string>ca-app-pub-3940256099942544/2934735716</string>
+	<key>AD_UNIT_ID_FOR_INTERSTITIAL_TEST</key>
+	<string>ca-app-pub-3940256099942544/4411468910</string>
+	<key>CLIENT_ID</key>
+	<string>624551167253-4jt5hmt1g9cqpmb1e3cd5qc477n6m1mc.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.624551167253-4jt5hmt1g9cqpmb1e3cd5qc477n6m1mc</string>
+	<key>API_KEY</key>
+	<string>AIzaSyB8ae9VWTkk3xBfcnqFd-Hpw7BcLK7nJ80</string>
+	<key>GCM_SENDER_ID</key>
+	<string>624551167253</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.after10workshop.lifeMoment</string>
+	<key>PROJECT_ID</key>
+	<string>life-moment-89403</string>
+	<key>STORAGE_BUCKET</key>
+	<string>life-moment-89403.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<true></true>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<false></false>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:624551167253:ios:51f9429aa5881d3d</string>
+	<key>DATABASE_URL</key>
+	<string>https://life-moment-89403.firebaseio.com</string>
+</dict>
+</plist>

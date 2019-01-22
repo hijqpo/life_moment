@@ -34,7 +34,7 @@ class MainViewState extends State<MainView> {
     GlobalState.mainViewState = this;
   }
 
-  static int _defaultIndex = 1;
+  static int _defaultIndex = 0;
 
   String _title = Titles[_defaultIndex];
   int _selectedIndex = _defaultIndex;

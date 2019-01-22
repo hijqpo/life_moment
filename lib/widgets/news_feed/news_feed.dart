@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:life_moment/data/news_feed_data.dart';
+import 'package:life_moment/data_structures/news_feed_data.dart';
+
+
+enum NewsFeedType {
+  Normal,
+  Warning,
+
+}
 
 
 class NewsFeed extends StatefulWidget {
 
-  NewsFeed(this.data);
+  NewsFeed(this.data, {this.type: NewsFeedType.Normal});
 
   final NewsFeedData data;
+  final NewsFeedType type;
 
   @override
   State<StatefulWidget> createState() {
@@ -15,6 +23,7 @@ class NewsFeed extends StatefulWidget {
 }
 
 class _NewsFeedState extends State<NewsFeed> {
+
 
   @override
   Widget build(BuildContext context) {

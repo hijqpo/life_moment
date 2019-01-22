@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:life_moment/forms/login_form.dart';
+import 'package:life_moment/views/debug_setting_view.dart';
 
 class LoginView extends StatefulWidget {
 
@@ -13,6 +14,13 @@ class LoginView extends StatefulWidget {
 
 class _LoginViewState extends State<LoginView> {
 
+  _onSettingPressed() {
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => DebugSettingView())
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,8 +28,14 @@ class _LoginViewState extends State<LoginView> {
 
       appBar: AppBar(
         title: Text('Login'),
-
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.settings),
+            onPressed: _onSettingPressed,
+          )
+        ]
       ),
+
       body: Center(
         child: Column(
 

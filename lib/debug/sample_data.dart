@@ -1,4 +1,5 @@
-import 'package:life_moment/data/news_feed_data.dart';
+import 'package:life_moment/data_structures/debug_login_data.dart';
+import 'package:life_moment/data_structures/news_feed_data.dart';
 
 
 class SampleData {
@@ -11,11 +12,14 @@ class SampleData {
     NewsFeedData(name: 'Keanu Wong', description: '^^'),
     NewsFeedData(name: 'Ares Wong', description: 'Hello world'),
     NewsFeedData(name: 'George Wong', description: 'No comment, because I dont speak'),
+  ];
 
+  static List<DebugLoginData> debugLoginData = [
+
+    DebugLoginData(email: 'tinchun1994@gmail.com', password:'lifemoment'),
 
   ];
 
 
-
-
 }
+
