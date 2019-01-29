@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:life_moment/state.dart';
 import 'package:life_moment/views/signup_view.dart';
 import 'package:life_moment/views/main_view.dart';
 
@@ -44,23 +45,14 @@ class _LoginFormState extends State<LoginForm> {
     if (_formKey.currentState.validate()){
       _formKey.currentState.save();
       debugPrint('[Login Form] Local form field check passed');
-
       
       try {
         debugPrint('[Login Form] Attempt to login to Firebase');
-        _onStartLoading();
+        //_onStartLoading();
         FirebaseUser user = await FirebaseAuth.instance.signInWithEmailAndPassword(email: _email, password: _password);
-        
+        // GlobalState.currentUser = user;
 
         debugPrint(user.toString());
-
-        
-        _onFinishLoading();
-
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => MainView())
-        );
       }
       catch (error){
         setState(() {
@@ -72,7 +64,6 @@ class _LoginFormState extends State<LoginForm> {
           }          
         });
         print(error.toString());
-        _onFinishLoading();
       }
 
     }
@@ -86,30 +77,30 @@ class _LoginFormState extends State<LoginForm> {
     );
   }
 
-  void _onStartLoading(){
+  // void _onStartLoading(){
     
-    showDialog(
+  //   showDialog(
 
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return SimpleDialog(
-          title: const Text('Loading...', style: TextStyle(fontWeight: FontWeight.w500),),
-          children: <Widget>[
-            Padding(
-              padding: EdgeInsets.all(10),
-              child: CircularProgressIndicator(),
-            )
+  //     context: context,
+  //     barrierDismissible: false,
+  //     builder: (BuildContext context) {
+  //       return SimpleDialog(
+  //         title: const Text('Loading...', style: TextStyle(fontWeight: FontWeight.w500),),
+  //         children: <Widget>[
+  //           Padding(
+  //             padding: EdgeInsets.all(10),
+  //             child: CircularProgressIndicator(),
+  //           )
             
-          ],
-        );
-      }
-    );
-  }
+  //         ],
+  //       );
+  //     }
+  //   );
+  // }
 
-  void _onFinishLoading(){
-     Navigator.pop(context);
-  }
+  // void _onFinishLoading(){
+  //    Navigator.pop(context);
+  // }
 
 
 

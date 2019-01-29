@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:life_moment/forms/login_form.dart';
 import 'package:life_moment/views/main_view.dart';
 
@@ -12,6 +13,10 @@ enum Mood {
 
 
 class GlobalState {
+
+  // User state
+  static FirebaseUser currentUser;
+
 
   // System state
   
