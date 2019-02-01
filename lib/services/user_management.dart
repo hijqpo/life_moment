@@ -3,83 +3,115 @@ import 'package:flutter/material.dart';
 // Firebase package
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/services.dart';
+
+// System
+import 'package:life_moment/data_structures/system_data.dart';
 import 'package:life_moment/state.dart';
 
 // Views
 import 'package:life_moment/views/dashboard.dart';
-import 'package:life_moment/views/login_view.dart';
+import 'package:life_moment/views/signin_view.dart';
 
 class UserManagement {
 
-  static Widget authModule(){
+  static Future<OperationResponse> signIn({email, password}) async{
 
-    return StreamBuilder(
-      
-      stream: FirebaseAuth.instance.onAuthStateChanged,
-      builder: (BuildContext context, snapshot) {
+    try {
 
-        // Show loading screen
-        if (snapshot.connectionState == ConnectionState.waiting){
-          return Text('Loading');
+        debugPrint('[Auth] Attempt to login to Firebase');
+
+        FirebaseUser user = await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
+
+        debugPrint('[Auth] Login Success ${user.toString()}');
+
+        OperationResponse response = await initialUserDocument(user);
+
+        if (response.code == 51){
+          GlobalState.previousUserDocumentNotFound = true;
         }
-
-        // If current
-        if (snapshot.hasData){
-          GlobalState.currentUser = snapshot.data;
-          return Dashboard();
-        }
-        
-        return LoginView();
+        return response;
       }
-    );
+      catch (error){
+
+        debugPrint('[Auth] Login Fail');
+        debugPrint(error.toString());
+
+        if (error.code == 'sign_in_failed'){
+          // Sign fail, probably incorrect email or password
+          return OperationResponse(101, true, 'Incorrect Email / Password');
+        }
+        else {
+          // Unknown error
+          return OperationResponse(100, true, 'Unknown error - Error Code: ${error.code}');
+        }          
+      }
   }
 
   static void signOut(){
+    // TODO: Clear current user session related state
+    GlobalState.previousUserDocumentNotFound = false;
+
     FirebaseAuth.instance.signOut();
   }
 
-  static Widget userProfile(){
+  static Future<OperationResponse> signUp({@required email, @required password, String nickname}) async{
 
-    return StreamBuilder(
-      
-      stream: Firestore.instance.collection('users').where('uid', isEqualTo: GlobalState.currentUser.uid).snapshots(),
-      builder: (BuildContext context, snapshot) {
+    try {
 
-        if (snapshot.connectionState == ConnectionState.waiting){
-          return Center(child: CircularProgressIndicator());
-        }
+      debugPrint('[Auth] Attempt to create user');
 
-        if (snapshot.hasError){
-          return Center(child: Text('Error :('));
-        }
+      FirebaseUser user = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
 
-        if (snapshot.hasData){
+      debugPrint('[Auth] Create Success');
 
-          if (snapshot.data.documents.length == 0){
-            return Center(child: Text('User data not found'));
-          }
+      OperationResponse response = await initialUserDocument(user, nickname: nickname);
+      return response;
+    } 
+    catch (error) {
 
-          DocumentSnapshot documentSnapshot = snapshot.data.documents[0];
+      debugPrint('[Auth] Create User Fail');
+      debugPrint(error.toString());
 
-          return Container(
-            child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text('Display Name: ${documentSnapshot.data['displayName']}')      
-                  ],
-                ),
-              ),
-          );
-          
-        }
-
-        return Center(child: Text('Nothing Here'));
+      if (error.code == 'sign_in_failed'){
+        // TODO: Can be improved
+        return OperationResponse(102, true, error.details);
       }
-    );
+      else{
+        // Unknown error
+        return OperationResponse(100, true, error.toString());
+      }
+    }
   }
 
+  static Future<OperationResponse> initialUserDocument(FirebaseUser user, {String nickname}) async{
 
+    try{
+
+      Query query = Firestore.instance.collection('users').where('uid', isEqualTo: user.uid);
+      QuerySnapshot snapshot = await query.getDocuments();
+
+      if (snapshot.documents.length > 0){
+        // Document found, no need to do initialization
+        return OperationResponse.ok;
+      }
+      else{
+        // Document not found, create one instead
+        await Firestore.instance.collection('users').add({
+          'uid': user.uid,
+          'email': user.email,
+          'nickname': nickname == null ? 'Anonymous' : nickname
+        });
+        debugPrint('[User Data] New User document is created');
+        return OperationResponse(51, false, 'OK');
+      }
+    }
+    catch (error){
+
+      debugPrint('[User Data] Error occur during initialing user document');
+      return OperationResponse(105, true, 'Operation Error');
+    }
+  }
 }
 
 

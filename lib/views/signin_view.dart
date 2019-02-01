@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:life_moment/forms/login_form.dart';
+import 'package:life_moment/forms/signin_form.dart';
 import 'package:life_moment/views/debug_setting_view.dart';
 
-class LoginView extends StatefulWidget {
+class SignInView extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return new _LoginViewState();
+    return new _SignInViewState();
   }
 }
 
 
 
-class _LoginViewState extends State<LoginView> {
+class _SignInViewState extends State<SignInView> {
 
   _onSettingPressed() {
 
@@ -44,7 +44,7 @@ class _LoginViewState extends State<LoginView> {
 
             Container(
               margin: EdgeInsets.symmetric(horizontal: 30.0),
-              child: LoginForm(),
+              child: SignInForm(),
               
               )
           ]

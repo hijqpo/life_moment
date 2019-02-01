@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:life_moment/services/stream_widget.dart';
 import 'package:life_moment/services/user_management.dart';
 import 'package:life_moment/state.dart';
 import 'dart:async';
@@ -57,110 +58,6 @@ class _DashboardState extends State<Dashboard> {
     });
   }
 
-  _onMoodIconPressed() {
-
-    debugPrint('Mood is pressed');
-    _changeMood();
-  }
-
-  Future<void> _changeMood() async {
-    switch (await showDialog<Mood>(
-      context: context,
-      builder: (BuildContext context) {
-        return SimpleDialog(
-          title: const Text('What is your current mood?'),
-          children: <Widget>[
-
-            SimpleDialogOption(
-              onPressed: () { Navigator.pop(context, Mood.VeryHappy); },
-              child: const Text('Very Happy'),
-            ),
-
-            SimpleDialogOption(
-              onPressed: () { Navigator.pop(context, Mood.Happy); },
-              child: const Text('Happy'),
-            ),
-
-            SimpleDialogOption(
-              onPressed: () { Navigator.pop(context, Mood.Normal); },
-              child: const Text('Normal'),
-            ),
-
-            SimpleDialogOption(
-              onPressed: () { Navigator.pop(context, Mood.Sad); },
-              child: const Text('Sad'),
-            ),
-
-            SimpleDialogOption(
-              onPressed: () { Navigator.pop(context, Mood.VerySad); },
-              child: const Text('Very Sad'),
-            ),
-
-
-          ],
-        );
-      }
-    )) {
-
-      case Mood.VeryHappy:
-        // Let's go.
-        debugPrint('The user is now very happy');
-        GlobalState.updateCurrentMood(Mood.Happy);
-        break;
-
-      case Mood.Happy:
-        // Let's go.
-        debugPrint('The user is now happy');
-        GlobalState.updateCurrentMood(Mood.Happy);
-        break;
-
-      case Mood.Normal:
-
-        debugPrint('The user is now normal');
-        GlobalState.updateCurrentMood(Mood.Normal);
-        break;
-
-      case Mood.Sad:
-        debugPrint('The user is now sad');
-        GlobalState.updateCurrentMood(Mood.Sad);
-        break;
-
-      case Mood.VerySad:
-        // Let's go.
-        debugPrint('The user is now very sad');
-        GlobalState.updateCurrentMood(Mood.VerySad);
-        break;
-    }
-  }
-
-  void updateMood(Mood mood){
-
-    setState(() {
-      switch (mood){
-
-        case Mood.VeryHappy:
-          _currentEmojiIcon = Icon(Icons.mood);
-          break;
-
-        case Mood.Happy:
-          _currentEmojiIcon = Icon(Icons.mood);
-          break;
-
-        case Mood.Normal:
-          _currentEmojiIcon = Icon(Icons.sentiment_neutral);
-          break;
-
-        case Mood.Sad:
-          _currentEmojiIcon = Icon(Icons.mood_bad);
-          break;
-
-        case Mood.VerySad:
-          _currentEmojiIcon = Icon(Icons.mood);
-          break;
-      }
-    });
-  }
-
 
   @override
   Widget build(BuildContext context) {
@@ -170,12 +67,12 @@ class _DashboardState extends State<Dashboard> {
       appBar: AppBar(
         title: Text(_title),
         // Emoji Icon
-        leading: IconButton(
-          icon: _currentEmojiIcon,
-          tooltip: 'Click this to change your mood',
-          onPressed: _onMoodIconPressed,
 
-        ),
+        // leading: IconButton(
+        //   icon: _currentEmojiIcon,
+        //   tooltip: 'Click this to change your mood',
+        //   onPressed: null,
+        // ),
 
         actions: <Widget>[
           IconButton(

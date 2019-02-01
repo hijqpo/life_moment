@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:life_moment/services/user_management.dart';
-
-
+import 'package:life_moment/services/stream_widget.dart';
+import 'package:life_moment/state.dart';
 
 class ProfileView extends StatefulWidget {
   @override
@@ -11,6 +10,6 @@ class ProfileView extends StatefulWidget {
 class _ProfileViewState extends State<ProfileView> {
   @override
   Widget build(BuildContext context) {
-    return UserManagement.userProfile();
+    return Center(child: Text(GlobalState.userProfile.data['nickname']));
   }
 }

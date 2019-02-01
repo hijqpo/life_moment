@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:life_moment/services/stream_widget.dart';
 
-import 'package:life_moment/services/user_management.dart';
 
 
 void main() => runApp(new MyApp());
@@ -10,7 +10,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Life Moment',
       debugShowCheckedModeBanner: false,
       theme: new ThemeData(
         // This is the theme of your application.
@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         fontFamily: 'Gilroy'
       ),
-      home: UserManagement.authModule(),
+      home: StreamWidget.streamStructure(),
     );
   }
 }

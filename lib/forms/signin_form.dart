@@ -1,23 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:life_moment/data_structures/system_data.dart';
+import 'package:life_moment/services/user_management.dart';
 import 'package:life_moment/state.dart';
 import 'package:life_moment/views/signup_view.dart';
 import 'package:life_moment/views/main_view.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 
-class LoginForm extends StatefulWidget {
+class SignInForm extends StatefulWidget {
 
-  static _LoginFormState of(BuildContext context) => context.ancestorStateOfType(const TypeMatcher<_LoginFormState>());
+  static _SignInFormState of(BuildContext context) => context.ancestorStateOfType(const TypeMatcher<_SignInFormState>());
 
   @override
   State<StatefulWidget> createState() {
-    return _LoginFormState();
+    return _SignInFormState();
   }
 }
 
 
 
-class _LoginFormState extends State<LoginForm> {
+class _SignInFormState extends State<SignInForm> {
 
   String _email, _password;
 
@@ -27,6 +29,9 @@ class _LoginFormState extends State<LoginForm> {
   final _emailFieldController = TextEditingController();
   final _passwordFieldController = TextEditingController();
 
+  // This field use for locking any user input while the form is sent
+  bool _loading = false;
+
 
   void setFormFieldWithValue({String email = '', String password = ''}){
 
@@ -34,75 +39,37 @@ class _LoginFormState extends State<LoginForm> {
     _passwordFieldController.text = password;
   }
 
-
-
-
-  Future<void> _onLoginPressed() async{
+  Future<void> onSignInPressed() async{
 
     debugPrint('Login is pressed');
 
 
     if (_formKey.currentState.validate()){
-      _formKey.currentState.save();
+
       debugPrint('[Login Form] Local form field check passed');
+      _formKey.currentState.save();
       
-      try {
-        debugPrint('[Login Form] Attempt to login to Firebase');
-        //_onStartLoading();
-        FirebaseUser user = await FirebaseAuth.instance.signInWithEmailAndPassword(email: _email, password: _password);
-        // GlobalState.currentUser = user;
+      _loading = true;
+      OperationResponse response = await UserManagement.signIn(email: _email, password: _password);
 
-        debugPrint(user.toString());
-      }
-      catch (error){
+      // If the response is error, show the error message
+      if (response.isError){
         setState(() {
-          if (error.code == 'sign_in_failed'){
-            this._errorMessage = 'Incorrect Email / Password';
-          }
-          else {
-            this._errorMessage = 'Unknown error - Error Code: ${error.code}';
-          }          
+          this._errorMessage = response.message;
         });
-        print(error.toString());
       }
-
+      
+      _loading = false;
     }
   }
 
-  void _onSignUpPressed(){
+  void onSignUpPressed(){
 
     Navigator.push(
       context, 
       MaterialPageRoute(builder: (context) => SignUpView())
     );
   }
-
-  // void _onStartLoading(){
-    
-  //   showDialog(
-
-  //     context: context,
-  //     barrierDismissible: false,
-  //     builder: (BuildContext context) {
-  //       return SimpleDialog(
-  //         title: const Text('Loading...', style: TextStyle(fontWeight: FontWeight.w500),),
-  //         children: <Widget>[
-  //           Padding(
-  //             padding: EdgeInsets.all(10),
-  //             child: CircularProgressIndicator(),
-  //           )
-            
-  //         ],
-  //       );
-  //     }
-  //   );
-  // }
-
-  // void _onFinishLoading(){
-  //    Navigator.pop(context);
-  // }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -120,6 +87,7 @@ class _LoginFormState extends State<LoginForm> {
             TextFormField(
               controller: _emailFieldController,
               onSaved: (text) => _email = text,
+              enabled: !_loading,
               decoration: const InputDecoration(
                 icon: Icon(Icons.person),
                 labelText: 'Email',
@@ -139,13 +107,14 @@ class _LoginFormState extends State<LoginForm> {
               // Password field
               controller: _passwordFieldController,
               onSaved: (text) => _password = text,
+              enabled: !_loading,
               decoration: const InputDecoration(
                 icon: Icon(Icons.vpn_key),
                 labelText: 'Password',
 
               ),
               validator: (value) {
-
+                
                 if (value.isEmpty){
                   return 'Please fill in this field';
                 }
@@ -168,8 +137,9 @@ class _LoginFormState extends State<LoginForm> {
               children: <Widget>[
 
                 RaisedButton(
-                  child: Text('Login'),
-                  onPressed: () => _onLoginPressed(),
+                  child: Text('Sign In', style: TextStyle(color: Colors.white)),
+                  color: Colors.lightBlue,                  
+                  onPressed: _loading ? null : onSignInPressed,
                 ),
 
                 
@@ -185,7 +155,7 @@ class _LoginFormState extends State<LoginForm> {
                     'Don\'t have an account? Sign up now!',
                     style: TextStyle(fontWeight: FontWeight.w300),
                   ),
-                  onPressed: () => _onSignUpPressed(),
+                  onPressed: () => onSignUpPressed(),
                 )
 
           ]
