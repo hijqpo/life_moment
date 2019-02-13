@@ -7,10 +7,12 @@ class ProfileView extends StatefulWidget {
   _ProfileViewState createState() => _ProfileViewState();
 }
 String _fullName = GlobalState.userProfile.data['nickname'];
-String _followers = "173";
+String _friends = "173";
 String _posts = "24";
 String _scores = "450";
 String _bio = "Hello, I am a surprised cat. Meow";
+String _education = "The University of Hong Kong";
+String _dob = " 7 March 1997";
 
 Widget _buildCoverImage(Size screenSize) {
   return Container(
@@ -58,7 +60,7 @@ Widget _buildName(){
   );
 }
 
-Widget _buildStatItem(String label, String count) {
+Widget _buildStatItem(String label, String count, BuildContext context) {
   TextStyle _statLabelTextStyle = TextStyle(
     fontFamily: 'Roboto',
     color: Colors.black,
@@ -72,22 +74,29 @@ Widget _buildStatItem(String label, String count) {
     fontWeight: FontWeight.bold,
   );
 
-  return Column(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: <Widget>[
-      Text(
-        count,
-        style: _statCountTextStyle,
-      ),
-      Text(
-        label,
-        style: _statLabelTextStyle,
-      ),
-    ],
+  return GestureDetector(
+    onTap: (){
+      final snackBar = SnackBar(content: Text("Tap"));
+
+      Scaffold.of(context).showSnackBar(snackBar);
+    },
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Text(
+          count,
+          style: _statCountTextStyle,
+        ),
+        Text(
+          label,
+          style: _statLabelTextStyle,
+        ),
+      ],
+    ),
   );
 }
 
-Widget _buildStatContainer() {
+Widget _buildStatContainer(BuildContext context) {
   return Container(
     //alignment: Alignment(0.0, -0.5),
     height: 60.0,
@@ -98,9 +107,9 @@ Widget _buildStatContainer() {
     child: Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: <Widget>[
-        _buildStatItem("Followers", _followers),
-        _buildStatItem("Posts", _posts),
-        _buildStatItem("Scores", _scores),
+        _buildStatItem("Friends", _friends, context),
+        _buildStatItem("Posts", _posts, context),
+        _buildStatItem("Scores", _scores, context),
       ],
     ),
   );
@@ -120,14 +129,45 @@ Widget _buildBio(BuildContext context) {
     child: Container(
       color: Theme.of(context).scaffoldBackgroundColor,
       //padding: EdgeInsets.all(8.0),
-      
       height: 100,
       child: Text(
-        _bio,
+        "'$_bio'",
         textAlign: TextAlign.center,
         style: bioTextStyle,
       ),
     ),
+  );
+}
+
+Widget _buildSeparator(Size screenSize) {
+  return Container(
+    alignment: Alignment(0.0, 0.28),
+    child: Container(
+      width: screenSize.width / 1.3,
+      height: 2.0,
+      color: Colors.black54,
+      margin: EdgeInsets.only(top: 4.0),
+    ),
+  );
+}
+
+Widget _buildDob(BuildContext context){
+  return Container(
+    alignment: Alignment(-0.9, 0.4),
+      child: ListTile(
+        leading: Icon(Icons.cake),
+        title: Text('Birthday: $_dob'),
+      ),
+  );
+}
+
+Widget _buildEdu(BuildContext context){
+  return Container(
+    alignment: Alignment(-0.9, 0.5),
+      child: ListTile(
+        leading: Icon(Icons.school),
+        title: Text('Education: $_education'),
+      ),
   );
 }
 
@@ -141,9 +181,12 @@ class _ProfileViewState extends State<ProfileView> {
           _buildCoverImage(screenSize),
           _buildProfileImage(),
           _buildName(),
-          _buildStatContainer(),
+          _buildStatContainer(context),
           _buildBio(context),
-          
+          _buildDob(context),
+          _buildSeparator(screenSize),
+          _buildEdu(context),
+
         ],
       )
     );
