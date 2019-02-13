@@ -41,6 +41,9 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+  assets: 
+    - assets/images/cover.jpeg
+    - assets/images/cat.jpeg
 
   # To add assets to your application, add an assets section, like this:
   # assets:
@@ -105,7 +108,7 @@ flutter:
           weight: 900
         - asset: assets/fonts/Gilroy/w900i.otf
           weight: 900
-          style: italic
+          style: italic 
   #   - family: Trajan Pro
   #     fonts:
   #       - asset: fonts/TrajanPro.ttf
