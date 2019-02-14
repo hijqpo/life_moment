@@ -62,15 +62,15 @@ class _NotificationViewState extends State<NotificationView> {
               ],
             ),
             
-            Expanded(
-            child: new ListView.builder
-              (
-                itemCount: litems.length,
-                itemBuilder: (BuildContext ctxt, index) {
-                  return new Text(litems[index]);
-                }
-            )
-        )
+        //     Expanded(
+        //     child: new ListView.builder
+        //       (
+        //         itemCount: litems.length,
+        //         itemBuilder: (BuildContext ctxt, index) {
+        //           return new Text(litems[index]);
+        //         }
+        //     )
+        // )
             
 
           ],

@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:life_moment/data_structures/system_data.dart';
 import 'package:life_moment/services/user_management.dart';
-import 'package:life_moment/state.dart';
-import 'package:life_moment/views/signup_view.dart';
-import 'package:life_moment/views/main_view.dart';
 
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:life_moment/views/signup_view.dart';
+
+
 
 class SignInForm extends StatefulWidget {
 

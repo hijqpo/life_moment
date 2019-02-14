@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:life_moment/services/stream_widget.dart';
 import 'package:life_moment/services/user_management.dart';
 import 'package:life_moment/state.dart';
+import 'package:life_moment/views/friends_view.dart';
 import 'dart:async';
 
 // Views
 import 'package:life_moment/views/home_view.dart';
 import 'package:life_moment/views/notification_view.dart';
 import 'package:life_moment/views/profile_view.dart';
+import 'package:life_moment/widgets/dashboard_search_bar.dart';
 
 
 const List<String> Titles = [
@@ -43,7 +45,7 @@ class _DashboardState extends State<Dashboard> {
   
   final _widgetOptions = [
     HomeView(),
-    Text('Index 1: Friend'),
+    FriendView(),
     Text('Index 2: Life Moment'),
     NotificationView(),
     ProfileView(),
@@ -65,7 +67,10 @@ class _DashboardState extends State<Dashboard> {
     return Scaffold(
 
       appBar: AppBar(
-        title: Text(_title),
+        // title: Text(_title),
+        
+        title: DashboardSearchBar(),
+
         // Emoji Icon
 
         // leading: IconButton(
@@ -76,13 +81,15 @@ class _DashboardState extends State<Dashboard> {
 
         actions: <Widget>[
           IconButton(
-          icon: Icon(Icons.cancel),
-          tooltip: 'Sign Out',
-          onPressed: UserManagement.signOut,
-
-        ),
-
+            icon: Icon(Icons.notifications),
+            tooltip: 'Notifications',
+            onPressed: (){},
+          )
         ],
+
+        // ),
+
+        // ],
       ),
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex)

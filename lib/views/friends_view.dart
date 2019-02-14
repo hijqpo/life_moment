@@ -27,19 +27,7 @@ class _FriendViewState extends State<FriendView> {
       
       children: <Widget>[
 
-        MaterialSearch<String>(
-          placeholder: 'Search',
-
-          getResults: (String criteria) async {
-            
-            return [
-              MaterialSearchResult(value: 'A'),
-              MaterialSearchResult(value: 'B'),
-              MaterialSearchResult(value: 'C'),
-            ]; 
-
-          }
-        ),
+        //DashboardSearchBar(),
         Expanded(
           child: ListView(
 

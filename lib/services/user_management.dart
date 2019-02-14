@@ -1,17 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 // Firebase package
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/services.dart';
 
 // System
 import 'package:life_moment/data_structures/system_data.dart';
 import 'package:life_moment/state.dart';
-
-// Views
-import 'package:life_moment/views/dashboard.dart';
-import 'package:life_moment/views/signin_view.dart';
 
 class UserManagement {
 

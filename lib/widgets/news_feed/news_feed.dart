@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:life_moment/data_structures/mood_data.dart';
 import 'package:life_moment/data_structures/news_feed_data.dart';
 
 
@@ -27,9 +28,19 @@ class _NewsFeedState extends State<NewsFeed> {
 
   @override
   Widget build(BuildContext context) {
+
+    String nickname = widget.data.nickname == null ? 'Anonymous' : widget.data.nickname;
+    String description = widget.data.description == null ? '<No Description>' : widget.data.description;
+    String postTime = widget.data.postTime == null ? 'NO TIME RECORD' : widget.data.postTime.toLocal().toIso8601String();
+
+    Mood mood = widget.data.mood;
+    
+    
+
+
     return Container(
 
-      margin: EdgeInsets.symmetric(vertical: 5.0),
+      margin: const EdgeInsets.symmetric(vertical: 3.0, horizontal: 5.0),
 
       // decoration: BoxDecoration(
       //   border: Border.all(color: Colors.black87),
@@ -37,33 +48,44 @@ class _NewsFeedState extends State<NewsFeed> {
       // ),
 
       child: Card(
+        
+        color: mood.moodColor,
+        child: Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: Column(
 
-        child: Column(
+            children: <Widget>[
 
-          children: <Widget>[
-
-            ListTile(
-              leading: Icon(Icons.child_care),
-              title: Text(widget.data.name),
-              subtitle: Text(widget.data.description),
-            ),
-
-            ButtonTheme.bar( // make buttons use the appropriate styles for cards
-              child: ButtonBar(
-                children: <Widget>[
-                  FlatButton(
-                    child: const Text('LIKE'),
-                    onPressed: () { /* ... */ },
-                  ),
-                  FlatButton(
-                    child: const Text('DISLIKE'),
-                    onPressed: () { /* ... */ },
-                  ),
-                ],
+              ListTile(
+                leading: CircleAvatar(),
+                title: Text(
+                  nickname, 
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600
+                  )
+                ),
+                subtitle: Text(postTime),
+                trailing: mood.moodIcon,
+                
               ),
-            ),
 
-          ],
+              // ButtonTheme.bar( // make buttons use the appropriate styles for cards
+              //   child: ButtonBar(
+              //     children: <Widget>[
+              //       FlatButton(
+              //         child: const Text('LIKE'),
+              //         onPressed: () { /* ... */ },
+              //       ),
+              //       FlatButton(
+              //         child: const Text('DISLIKE'),
+              //         onPressed: () { /* ... */ },
+              //       ),
+              //     ],
+              //   ),
+              // ),
+
+            ],
+          ),
         ),
       ),
     ); 
