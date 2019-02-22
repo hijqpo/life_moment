@@ -28,15 +28,6 @@ class NewPostFormState extends State<NewPostForm> {
 
   Mood _currentMood = Mood();
 
-  Map<MoodType, Color> moodColorMap = {
-
-    MoodType.VeryUnhappy: Colors.red,
-    MoodType.Unhappy: Colors.red[200],
-    MoodType.Neutral: Colors.white,
-    MoodType.Happy: Colors.yellow[200],
-    MoodType.VeryHappy: Colors.yellow,
-  };
-
   void onMoodSelected(int typeCode){
 
     clearFieldFocus();
@@ -73,9 +64,10 @@ class NewPostFormState extends State<NewPostForm> {
     if (lerp <= 0) lerp = 0;
 
 
-    return moodColorMap[_currentMood.moodType] == null 
-      ? Colors.white 
-      : moodColorMap[_currentMood.moodType].withOpacity(0.5 + lerp);
+    // return moodColorMap[_currentMood.moodType] == null 
+    //   ? Colors.white 
+    //   : moodColorMap[_currentMood.moodType].withOpacity(0.5 + lerp);
+    return _currentMood.moodColor;
   }
 
   void clearFieldFocus(){
@@ -90,7 +82,7 @@ class NewPostFormState extends State<NewPostForm> {
 
     clearFieldFocus();
 
-    if (_currentMood.moodType == null){
+    if (_currentMood.moodType == MoodType.Undefined){
       setState((){
         _emptyMoodWarningMessage = 'Please Select a mood';
       });
@@ -138,6 +130,7 @@ class NewPostFormState extends State<NewPostForm> {
 
     // Prepare post data
     PostData data = PostData(mood: _currentMood, description: _descriptionFieldController.text);
+    // NewsFeedData data = NewsFeedData(mood: _currentMood, description: _descriptionFieldController.text);
 
     OperationResponse response = await DataManagement.submitNewPost(data);
 
@@ -242,27 +235,27 @@ class NewPostFormState extends State<NewPostForm> {
                     IconButton(
                       onPressed: (){onMoodSelected(0);},
                       icon: Icon(Icons.sentiment_very_dissatisfied),
-                      color: _currentMood.moodType == MoodType.VeryUnhappy ? moodColorMap[MoodType.VeryUnhappy] : Colors.black,
+                      color: _currentMood.moodType == MoodType.VeryUnhappy ? _currentMood.moodRawColor : Colors.black,
                     ),
                     IconButton(
                       onPressed: (){onMoodSelected(1);},
                       icon: Icon(Icons.sentiment_dissatisfied),
-                      color: _currentMood.moodType == MoodType.Unhappy ? moodColorMap[MoodType.Unhappy] : Colors.black,
+                      color: _currentMood.moodType == MoodType.Unhappy ? _currentMood.moodRawColor : Colors.black,
                     ),
                     IconButton(
                       onPressed: (){onMoodSelected(2);},
                       icon: Icon(Icons.sentiment_neutral),
-                      color: _currentMood.moodType == MoodType.Neutral ? moodColorMap[MoodType.Neutral] : Colors.black,
+                      color: _currentMood.moodType == MoodType.Neutral ? _currentMood.moodRawColor : Colors.black,
                     ),
                     IconButton(
                       onPressed: (){onMoodSelected(3);},
                       icon: Icon(Icons.sentiment_satisfied),
-                      color: _currentMood.moodType == MoodType.Happy ? moodColorMap[MoodType.Happy] : Colors.black,
+                      color: _currentMood.moodType == MoodType.Happy ? _currentMood.moodRawColor : Colors.black,
                     ),
                     IconButton(
                       onPressed: (){onMoodSelected(4);},
                       icon: Icon(Icons.sentiment_very_satisfied),
-                      color: _currentMood.moodType == MoodType.VeryHappy ? moodColorMap[MoodType.VeryHappy] : Colors.black,
+                      color: _currentMood.moodType == MoodType.VeryHappy ? _currentMood.moodRawColor : Colors.black,
                     )
 
                   ],

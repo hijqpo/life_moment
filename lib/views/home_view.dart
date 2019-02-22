@@ -59,6 +59,9 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
+
+    // onRefresh();
+
     return Center(
       child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

@@ -47,9 +47,9 @@ class Mood {
 
     0: Colors.red,
     1: Colors.red[200],
-    2: Colors.white,
+    2: Colors.green[300],
     3: Colors.yellow[200],
-    4: Colors.yellow,
+    4: Colors.orange,
   };
 
   MoodType _type;
@@ -113,6 +113,16 @@ class Mood {
     return result;
   }
 
+  Icon get colorMoodIcon{
+    Icon result = Icon(
+      _codeIconMap[_typeCode],
+      color: _codeColorMap[_typeCode],
+    );
+    if (result == null) return Icon(Icons.error_outline);
+
+    return result;
+  }
+
   Color get moodColor{
     
     Color result = _codeColorMap[_typeCode];
@@ -124,6 +134,12 @@ class Mood {
 
 
     return result.withOpacity(0.5 + lerp);
+  }
+
+  Color get moodRawColor{
+    Color result = _codeColorMap[_typeCode];
+    if (result == null) return Colors.white;
+    return result;
   }
 
   int get moodTypeCode {

@@ -54,7 +54,8 @@ class StreamWidget {
               if (userProfileSnapshot.hasData){
 
                 if (userProfileSnapshot.data.documents.length == 0){
-                  return Center(child: Text('User Profile not Found'));
+                  // return Center(child: Text('User Profile not Found'));
+                  return SignInView();
                 }
                 debugPrint(GlobalState.userProfileSnapshot.data.documents[0].data.toString());
                 return Dashboard();
