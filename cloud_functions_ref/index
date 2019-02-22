@@ -1,0 +1,242 @@
+import * as functions from 'firebase-functions';
+import * as admin from 'firebase-admin';
+// tslint:disable-next-line:no-implicit-dependencies
+import { QueryDocumentSnapshot, DocumentReference } from '@google-cloud/firestore';
+import { DocumentSnapshot } from 'firebase-functions/lib/providers/firestore';
+
+admin.initializeApp();
+admin.firestore().settings({timestampsInSnapshots: true});
+
+
+// // Start writing Firebase Functions
+// // https://firebase.google.com/docs/functions/typescript
+//
+
+
+
+export const helloWorld = functions.https.onRequest((request, response) => {
+ response.send("Hello from Firebase!");
+});
+
+export const createUserInterestedPost = functions.firestore.document('users/{userDoc}/posts/{postDoc}').onCreate(async (snap, context) => {
+
+  try {
+    const newPostDocID = snap.id;
+    const postOwnerDocID = context.params.userDoc;
+
+    const snapData = snap.data();
+    const postOwnerUid = snapData === undefined ? 'NO UID' : snapData.uid;
+    const postTime = snapData === undefined ? new Date() : snapData.postTime;
+
+    console.log(`New Post documentID: ${newPostDocID}, Post Owner documentID: ${postOwnerDocID}, Post Owner UID: ${postOwnerUid}`, )
+
+
+    const selfPromise = admin.firestore().collection('users').doc(postOwnerDocID).collection('interestedPosts').add({
+      
+      postRef: snap.ref,
+      postTime: postTime,
+      ownerUid: postOwnerUid,
+    });
+
+    const friendsSnapshot = await admin.firestore().collection('users').doc(postOwnerDocID).collection('friends').get();
+
+    const friendMapFunction = (friend: QueryDocumentSnapshot) => {
+
+      return new Promise((resolve) => {
+        admin.firestore().collection('users').where('uid', '==', friend.data().uid).get()
+        .then((friendSnapshot) => {
+          resolve(
+            friendSnapshot.docs[0].ref.collection('interestedPosts').add({
+              postRef: snap.ref,
+              ownerUid: postOwnerUid,
+            })
+          )
+        }).catch(error => {throw error});
+      })
+    }
+
+    const friendListPromise = friendsSnapshot.docs.map(friendMapFunction);
+
+    const friendPromise = Promise.all(friendListPromise);
+
+    return await Promise.all([selfPromise, friendPromise])
+  }
+  catch(error){
+    throw error;
+  }
+});
+
+export const loadInterestedPosts = functions.https.onCall(async (data, context) => {
+
+  try {
+
+    const userDocumentID = data.documentID;
+    const uid = data.uid;
+
+    const postRefList: DocumentReference[] = [];
+
+    console.log(`Retriving interested post references in ${userDocumentID}...`);
+
+    console.time('t1');
+    const snapshot = await admin.firestore().collection('users').doc(userDocumentID).collection('interestedPosts').orderBy('postTime', 'desc').limit(10).get();
+    console.timeEnd('t1');
+
+    console.log(`${snapshot.docs.length} interested post references found`);
+
+    
+    snapshot.docs.forEach((doc) => {
+      postRefList.push(doc.data().postRef);
+    })
+
+    console.log(`Fetching post references...`);
+    console.time('t2');
+    const docSnapshots = await admin.firestore().getAll(...postRefList);
+    console.timeEnd('t2');
+
+
+    const userProfileMapFunction = (ds: DocumentSnapshot) => {
+      return new Promise(async (resolve) => {
+
+        const temp = ds.data();
+        if (temp !== undefined){
+          const userProfile = await admin.firestore().collection('users').where('uid', '==', temp.uid).get();
+
+            if (!userProfile.empty){
+              temp.nickname = userProfile.docs[0].data().nickname;
+              temp.documentID = ds.id;
+              temp.ownerDocumentID = userProfile.docs[0].id;
+
+              // Add number of Noticed here
+              // And check if self 
+              if (Array.isArray(temp.notices)){
+                temp.noticeCount = temp.notices.length;
+                temp.selfNoticed = temp.notices.includes(uid);
+              }
+              else{
+                temp.noticeCount = 0;
+                temp.selfNoticed = false;
+              }
+
+              delete temp.notices;
+            }
+
+            resolve(temp);
+        }
+        else{
+          resolve(temp);
+        }
+      })
+    }
+
+
+    const promises = docSnapshots.map(userProfileMapFunction);
+
+    return await Promise.all(promises);
+
+    // return resultList;
+  }
+  catch(error){
+    throw error;
+  }
+})
+
+export const noticePost = functions.https.onCall(async (data, context) => {
+
+  try {
+
+    const postOwnerDocumentID = data.postOwnerDocumentID;
+    const postDocumentID = data.postDocumentID;
+    const uid = data.uid;
+
+    const docRef = admin.firestore().collection('users').doc(postOwnerDocumentID).collection('posts').doc(postDocumentID);
+
+    docRef.get()
+    .then((snapshot) => {
+
+      const temp = snapshot.data();
+      // console.log(temp);
+
+      if (temp === undefined){
+        // No people noticed before, i.e. no [notices] field
+      }
+      else{
+        if (Array.isArray(temp.notices)){
+          // console.log(temp.notices);
+          const included = temp.notices.includes(uid);
+
+          if (included){
+            console.log('Marked Noticed');
+            docRef.update({
+              notices: admin.firestore.FieldValue.arrayRemove(...[uid])
+            })
+            .catch(error => {throw error});
+          }
+          else{
+            console.log('UnMarked Noticed');
+            docRef.update({  
+              notices: admin.firestore.FieldValue.arrayUnion(...[uid])
+            })
+            .catch(error => {throw error});
+          }
+        }
+        else{
+          console.log('Set??');
+          docRef.set({
+            notices: [uid]
+          }, {merge: true})
+          .catch(error => {throw error});
+        }
+
+      }
+    })
+    .catch(error => {throw error});
+
+    return true;
+  }
+  catch(error){
+    throw error;
+  }
+
+})
+
+
+
+// export const getInterstedPost = functions
+
+
+// export const createNewUserProfile = functions.auth.user().onCreate((user) => {
+
+//   admin.firestore().collection('users').add(
+//     {
+//       uid: user.uid,
+//       email: user.email,
+//     })
+//     .then((docRef) => {
+
+//       console.log(docRef);
+//     })
+//     .catch(err => {
+//       console.log(err);
+//     });
+
+// });
+
+// export const removeUserProfile = functions.auth.user().onDelete((user) => {
+
+//   admin.firestore().collection('user').where('uid', '==', user.uid).get()
+//     .then((snapshot) => {
+
+//       if (snapshot.empty){
+//         console.log('NOOOOO');
+//       }
+
+//       // snapshot.forEach((doc) => {
+        
+//       // });
+
+
+//       Promise.resolve();
+//     })
+//     .catch((err) => Promise.reject());
+
+// })
