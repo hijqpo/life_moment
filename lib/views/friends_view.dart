@@ -9,6 +9,8 @@ import 'package:material_search/material_search.dart';
 // data
 import 'package:life_moment/data_structures/news_feed_data.dart';
 
+import 'package:life_moment/views/profile_view.dart';
+
 class FriendView extends StatefulWidget {
 
   @override

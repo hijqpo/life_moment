@@ -29,6 +29,15 @@ dependencies:
   cloud_firestore: ^0.8.2+3
   cloud_functions: ^0.1.0+1
 
+  # Charts
+  charts_flutter: ^0.6.0
+
+  #fcharts
+  fcharts: ^0.0.10
+  
+  # Tuple
+  tuple: "^1.0.1"
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
