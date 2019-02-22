@@ -7,7 +7,7 @@ import 'dart:async';
 
 // Views
 import 'package:life_moment/views/home_view.dart';
-import 'package:life_moment/views/notification_view.dart';
+import 'package:life_moment/views/chart_view.dart';
 import 'package:life_moment/views/profile_view.dart';
 import 'package:life_moment/widgets/dashboard_search_bar.dart';
 
@@ -47,7 +47,7 @@ class _DashboardState extends State<Dashboard> {
     HomeView(),
     FriendView(),
     Text('Index 2: Life Moment'),
-    NotificationView(),
+    ChartView(),
     ProfileView(),
   ];
 
@@ -104,7 +104,7 @@ class _DashboardState extends State<Dashboard> {
             BottomNavigationBarItem(icon: Icon(Icons.home), title: Text('Home')),
             BottomNavigationBarItem(icon: Icon(Icons.group), title: Text('Friend')),
             BottomNavigationBarItem(icon: Icon(Icons.calendar_today), title: Text('Life Moment')),
-            BottomNavigationBarItem(icon: Icon(Icons.notifications), title: Text('Notifications')),
+            BottomNavigationBarItem(icon: Icon(Icons.insert_chart), title: Text('Chart')),
             BottomNavigationBarItem(icon: Icon(Icons.person), title: Text('Profile')),
           ],
           currentIndex: _selectedIndex,

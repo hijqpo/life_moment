@@ -1,20 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:life_moment/services/stream_widget.dart';
-import 'package:life_moment/services/user_management.dart';
+//import 'package:life_moment/services/stream_widget.dart';
+//import 'package:life_moment/services/user_management.dart';
 import 'package:life_moment/state.dart';
+import 'package:fcharts/fcharts.dart';
+
 
 class ProfileView extends StatefulWidget {
-
   @override
   _ProfileViewState createState() => _ProfileViewState();
 }
+
 String _fullName = GlobalState.userProfile.nickname;
 String _friends = "173";
 String _posts = "24";
 String _scores = "450";
 String _bio = "Hello, I am a surprised cat. Meow";
 String _education = "The University of Hong Kong";
-String _dob = " 7 March 1997";
+String _dob = "15 Feb 2019";
+//final StorageReference ref = FirebaseStorage.instance.ref().child('users/assets/images/cat.jpeg');
+//final Uri downloadUrl = await ref.getDownloadUrl();
 
 Widget _buildCoverImage(Size screenSize) {
   return Container(
@@ -35,15 +39,15 @@ Widget _buildProfileImage() {
       width: 140.0,
       height: 140.0,
       decoration: BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage('assets/images/cat.jpeg'),
-          fit: BoxFit.cover,
-        ),
-        borderRadius: BorderRadius.circular(80.0),
-        border: Border.all(
-          color: Colors.white,
-          width: 10.0,
-        ),
+          image: DecorationImage(
+            image: NetworkImage('https://firebasestorage.googleapis.com/v0/b/life-moment-89403.appspot.com/o/profile_pics%2Fcat.jpeg?alt=media&token=c2bab624-8fb8-4089-b7a5-54aff38644b6'),
+            fit: BoxFit.cover,
+          ),
+          borderRadius: BorderRadius.circular(80.0),
+          border: Border.all(
+            color: Colors.white,
+            width: 10.0,
+          ),
       ),
     ),
   );
@@ -120,7 +124,7 @@ Widget _buildStatContainer(BuildContext context) {
 Widget _buildBio(BuildContext context) {
   TextStyle bioTextStyle = TextStyle(
     fontFamily: 'Spectral',
-    fontWeight: FontWeight.w400,//try changing weight to w500 if not thin
+    fontWeight: FontWeight.w400,
     fontStyle: FontStyle.italic,
     color: Color(0xFF799497),
     fontSize: 16.0,
@@ -173,17 +177,41 @@ Widget _buildEdu(BuildContext context){
   );
 }
 
+const data = [0.0, -0.2, -0.9, -0.5, 0.0, 0.5, 0.6, 0.9, 0.8, 1.2, 0.5, 0.0];
+Widget _buildChart(){
+  return Container(
+    alignment: Alignment(0.0, -0.9),
+    
+    child: AspectRatio(
+      aspectRatio: 4.0,
+      child: new LineChart(
+        lines: [
+          new Sparkline(
+            data: data,
+            stroke: new PaintOptions.stroke(
+              color: Colors.blue,
+              strokeWidth: 2.0,
+            ),
+            marker: new MarkerOptions(
+              paint: new PaintOptions.fill(color: Colors.blue),
+            ),
+          ),
+        ],
+      ),
+    ),
+  
+  );
+}
 class _ProfileViewState extends State<ProfileView> {
-
-  String _uid;
-
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
     return Scaffold(
       body: Stack(
         children: <Widget>[
-          _buildCoverImage(screenSize),
+          //_buildCoverImage(screenSize),
+          Text('Mood Progress',style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),),
+          _buildChart(),
           _buildProfileImage(),
           _buildName(),
           _buildStatContainer(context),
@@ -191,6 +219,7 @@ class _ProfileViewState extends State<ProfileView> {
           _buildDob(context),
           _buildSeparator(screenSize),
           _buildEdu(context),
+          
 
         ],
       )
