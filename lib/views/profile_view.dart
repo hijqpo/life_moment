@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-//import 'package:life_moment/services/stream_widget.dart';
-//import 'package:life_moment/services/user_management.dart';
+import 'package:life_moment/services/stream_widget.dart';
+import 'package:life_moment/services/user_management.dart';
 import 'package:life_moment/state.dart';
 import 'package:fcharts/fcharts.dart';
 
@@ -202,6 +202,39 @@ Widget _buildChart(){
   
   );
 }
+
+void onIconButtonPressed(){
+  UserManagement.signOut();
+}
+
+Widget _buildButton(){
+  return Container(
+    alignment: Alignment(0.0, 0.9),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: <Widget>[
+        RaisedButton(
+          padding: const EdgeInsets.all(8.0),
+          textColor: Colors.white,
+          color: Colors.blue,
+          //onPressed: editProfile(),
+          child: new Text("EditProfile"),
+        ),
+
+        RaisedButton(
+          onPressed: onIconButtonPressed,
+          textColor: Colors.white,
+          color: Colors.red,
+          padding: const EdgeInsets.all(8.0),
+          child: new Text(
+            "Logout",
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
 class _ProfileViewState extends State<ProfileView> {
   @override
   Widget build(BuildContext context) {
@@ -219,6 +252,7 @@ class _ProfileViewState extends State<ProfileView> {
           _buildDob(context),
           _buildSeparator(screenSize),
           _buildEdu(context),
+          _buildButton(),
           
 
         ],

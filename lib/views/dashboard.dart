@@ -10,7 +10,7 @@ import 'package:life_moment/views/home_view.dart';
 import 'package:life_moment/views/chart_view.dart';
 import 'package:life_moment/views/profile_view.dart';
 import 'package:life_moment/widgets/dashboard_search_bar.dart';
-
+import 'package:life_moment/views/notification_view.dart';
 
 const List<String> Titles = [
   'Home',
