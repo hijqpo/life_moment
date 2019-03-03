@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fcharts/fcharts.dart';
+import 'package:charts_flutter/flutter.dart' as charts;
 
 const data = [0.0, -0.2, -0.9, -0.5, 0.0, 0.5, 0.6, 0.9, 0.8, 1.2, 0.5, 0.0];
 Widget _buildChart(){
@@ -32,7 +33,7 @@ class ChartView extends StatelessWidget {
       child: Column(
         children: <Widget>[
           //_buildCoverImage(screenSize),
-          Text('Mood Chart'),
+          Text('Mood Progress'),
           _buildChart(),
           
 
