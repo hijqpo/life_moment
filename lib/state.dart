@@ -9,7 +9,6 @@ import 'package:life_moment/views/main_view.dart';
 
 class GlobalState {
 
-
   // Stream snapshot
   static AsyncSnapshot<dynamic> authSnapshot;
   static AsyncSnapshot<dynamic> userProfileSnapshot;
@@ -20,27 +19,78 @@ class GlobalState {
   }
 
   static UserProfile get userProfile {
+
     Map<String, dynamic> dataMap = userProfileSnapshot.data.documents[0].data;
 
-    return UserProfile(
-      nickname: dataMap['nickname'],
-
-
-      uid: dataMap['uid'],
-      documentID: userProfileSnapshot.data.documents[0].documentID,
-    );
+    dataMap['documentID'] = userProfileSnapshot.data.documents[0].documentID;
+    return UserProfile(dataMap: dataMap);
   }
-
 
 
   // User Data
   static bool previousUserDocumentNotFound = false;
 
+  static Map<String, NewsFeedData> _tempNewsFeedDataMap = {};
+  static Map<String, NewsFeedData> _newsFeedDataMap = {};
 
-  static List<NewsFeedData> newsFeedDataList = [];
+  static void updateNewsFeedDataList(NewsFeedData data){
+
+    String postID = data.postID;
+    if (_tempNewsFeedDataMap.containsKey(postID)){
+      _tempNewsFeedDataMap.remove(postID);
+    }
+    _newsFeedDataMap[data.postID] = data;  
+  }
+
+  static void appendNewsFeedDataToTempList(NewsFeedData data){
+
+    String postID = data.postID;
+    _tempNewsFeedDataMap[postID] = data;
+  }
+
+  static List<NewsFeedData> get newsFeedDataList {
+    return _newsFeedDataMap.values.toList();
+  }
+
+  static List<NewsFeedData> get newsFeedDataTempList {
+    return _tempNewsFeedDataMap.values.toList();
+  }
+
+
+  static Map<String, UserProfile> _searchResultMap = {};
+
+  static void appendSearchResult(UserProfile profile){
+
+    String uid = profile.uid;
+    _searchResultMap[uid] = profile;
+  }
+
+  static List<UserProfile> get searchResultList {
+    return _searchResultMap.values.toList();
+  }
+
+  static void clearSearchResult(){
+    _searchResultMap.clear();
+  }
+
+  // static Stream<List<NewsFeedData>> newsFeedDataStream() async*{
+    
+  //   // for (int i=0; i<newsFeedDataList.length; i++){
+  //   //   yield newsFeedDataList[i];
+  //   // }
+  //   yield newsFeedDataList;
+  // }
 
   // System state
   
+
+  static void clearCurrentState(){
+
+    _newsFeedDataMap.clear();
+    _tempNewsFeedDataMap.clear();
+    _searchResultMap.clear();
+  }
+
 
   static SignInForm signInForm;
 

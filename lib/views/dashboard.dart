@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:life_moment/services/auth_management.dart';
 import 'package:life_moment/services/stream_widget.dart';
 import 'package:life_moment/services/user_management.dart';
 import 'package:life_moment/state.dart';
-import 'package:life_moment/views/friends_view.dart';
+import 'package:life_moment/views/friend_profile_view.dart';
 import 'dart:async';
 
 // Views
@@ -20,16 +22,12 @@ const List<String> Titles = [
   'Profile'
 ];
 
-
-
-
 class Dashboard extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
     return new _DashboardState();
   }
-
 }
 
 
@@ -39,24 +37,23 @@ class _DashboardState extends State<Dashboard> {
 
   static int _defaultIndex = 0;
 
-  String _title = Titles[_defaultIndex];
+  // String _title = Titles[_defaultIndex];
   int _selectedIndex = _defaultIndex;
-  Icon _currentEmojiIcon = Icon(Icons.mood);
+  // Icon _currentEmojiIcon = Icon(Icons.mood);
   
   final _widgetOptions = [
     HomeView(),
-    FriendView(),
+    // FriendProfileView(),
+    Text('Index 1: ??????'),
     Text('Index 2: Life Moment'),
     ChartView(),
-    ProfileView(),
+    ProfileView(profile: GlobalState.userProfile),
   ];
-
-
 
   _onNavItemTapped(int index){
     setState(() {
       _selectedIndex = index;
-      _title = Titles[_selectedIndex];
+      // title = Titles[_selectedIndex];
     });
   }
 
@@ -66,34 +63,60 @@ class _DashboardState extends State<Dashboard> {
   
     return Scaffold(
 
-      appBar: AppBar(
-        // title: Text(_title),
-        
-        title: DashboardSearchBar(),
+      appBar: PreferredSize(
+        preferredSize: Size(0, 40),
+        child:  AppBar(
+          title: DashboardSearchBar(),
 
-        // Emoji Icon
+          leading: IconButton(
+            icon: Icon(
+              FontAwesomeIcons.signOutAlt,
+              size: 20,  
+            ),
+            tooltip: 'Sign out',
+            onPressed: AuthManagement.signOut,
+          ),
 
-        // leading: IconButton(
-        //   icon: _currentEmojiIcon,
-        //   tooltip: 'Click this to change your mood',
-        //   onPressed: null,
-        // ),
-
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.notifications),
-            tooltip: 'Notifications',
-            onPressed: (){},
-          )
-        ],
-
-        // ),
-
-        // ],
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.notifications),
+              tooltip: 'Notifications',
+              onPressed: (){},
+            )
+          ],
+        )
       ),
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex)
       ),
+      // body: Center(
+      //   child: Stack(
+      //     children: <Widget>[
+      //       Offstage(
+      //         offstage: _selectedIndex != 0,
+      //         child: HomeView()
+      //       ),
+      //       Offstage(
+      //         offstage: _selectedIndex != 1,
+      //         child: Text('Index 1: ??????'),
+      //       ),
+      //       Offstage(
+      //         offstage: _selectedIndex != 2,
+      //         child: Text('Index 2: Life Moment'),
+      //       ),
+      //       Offstage(
+      //         offstage: _selectedIndex != 3,
+      //         child: ChartView(),
+      //       ),
+      //       Offstage(
+      //         offstage: _selectedIndex != 4,
+      //         child: ProfileView(),
+      //       ),
+
+      //     ]
+      //   ),
+      // ),
+
       bottomNavigationBar: Theme(
         data: Theme.of(context).copyWith(
           canvasColor: Colors.orangeAccent

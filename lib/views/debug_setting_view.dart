@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:life_moment/data_structures/system_data.dart';
+import 'package:life_moment/services/operation_management.dart';
 
 class DebugSettingView extends StatefulWidget{
 
@@ -15,7 +17,15 @@ class _DebugSettingViewState extends State<DebugSettingView> {
   final _apiBaseUrlFieldController = TextEditingController();
 
 
+  Future<void> onExceptionTestPressed() async{
 
+    OperationResponse result = await OperationManagement.exceptionPlayground();
+  }
+
+  Future<void> onClearAllPostsPressed() async{
+
+    OperationResponse result = await OperationManagement.clearAllPosts();
+  }
 
 
   @override
@@ -44,9 +54,20 @@ class _DebugSettingViewState extends State<DebugSettingView> {
             onTap: () {
               // Update the state of the app
               // ...
-            },
+            }
+          ),
 
-            
+          ListTile(
+            title: Text('Clear All Posts'),
+            onTap: onClearAllPostsPressed
+          ),
+
+          ListTile(
+            title: Text('Item 2'),
+            onTap: () {
+              // Update the state of the app
+              // ...
+            }
           ),
 
           

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:life_moment/data_structures/system_data.dart';
-import 'package:life_moment/services/user_management.dart';
+import 'package:life_moment/services/auth_management.dart';
 
 import 'package:life_moment/views/signup_view.dart';
 
@@ -15,8 +15,6 @@ class SignInForm extends StatefulWidget {
     return _SignInFormState();
   }
 }
-
-
 
 class _SignInFormState extends State<SignInForm> {
 
@@ -42,23 +40,26 @@ class _SignInFormState extends State<SignInForm> {
 
     debugPrint('Login is pressed');
 
-
     if (_formKey.currentState.validate()){
 
       debugPrint('[Login Form] Local form field check passed');
       _formKey.currentState.save();
       
-      _loading = true;
-      OperationResponse response = await UserManagement.signIn(email: _email, password: _password);
+      setState(() {
+        _loading = true;
+      });
+      
+      OperationResponse response = await AuthManagement.signIn(email: _email, password: _password);
 
       // If the response is error, show the error message
       if (response.isError){
-        setState(() {
+        setState((){
           this._errorMessage = response.message;
+          _loading = false;
         });
       }
       
-      _loading = false;
+      
     }
   }
 

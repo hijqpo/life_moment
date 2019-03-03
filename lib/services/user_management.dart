@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 
 // Firebase package
@@ -12,102 +13,65 @@ import 'package:life_moment/state.dart';
 
 class UserManagement {
 
-  static Future<OperationResponse> signIn({email, password}) async{
+  static Future<OperationResponse> search({@required String keyword}) async{
 
     try {
 
-        debugPrint('[Auth] Attempt to login to Firebase');
+      UserProfile userProfile = GlobalState.userProfile;
 
-        FirebaseUser user = await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
+      debugPrint('Searching with [$keyword]...');
+      List<dynamic> result = await CloudFunctions.instance.call(
+        functionName: 'search', 
+        parameters: {
+        'uid': userProfile.uid,
+        'keyword': keyword,
+      });
 
-        debugPrint('[Auth] Login Success ${user.toString()}');
+      debugPrint('${result.last}');
 
-        OperationResponse response = await initialUserDocument(user);
+      List<dynamic> searchResutls = result.first;
 
-        if (response.code == 51){
-          GlobalState.previousUserDocumentNotFound = true;
-        }
-        return response;
-      }
-      catch (error){
+      searchResutls.forEach((data) {
+        
+        UserProfile profile = UserProfile.createFormDataMap(dataMap: data);
 
-        debugPrint('[Auth] Login Fail');
-        debugPrint(error.toString());
+        GlobalState.appendSearchResult(profile);
+      });
 
-        if (error.code == 'sign_in_failed'){
-          // Sign fail, probably incorrect email or password
-          return OperationResponse(101, true, 'Incorrect Email / Password');
-        }
-        else {
-          // Unknown error
-          return OperationResponse(100, true, 'Unknown error - Error Code: ${error.code}');
-        }          
-      }
-  }
-
-  static void signOut(){
-    // TODO: Clear current user session related state
-    GlobalState.previousUserDocumentNotFound = false;
-
-    FirebaseAuth.instance.signOut();
-  }
-
-  static Future<OperationResponse> signUp({@required email, @required password, String nickname}) async{
-
-    try {
-
-      debugPrint('[Auth] Attempt to create user');
-
-      FirebaseUser user = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
-
-      debugPrint('[Auth] Create Success');
-
-      OperationResponse response = await initialUserDocument(user, nickname: nickname);
-      return response;
-    } 
-    catch (error) {
-
-      debugPrint('[Auth] Create User Fail');
+      return OperationResponse(20, false, 'Success');
+    }
+    catch(error){
       debugPrint(error.toString());
-
-      if (error.code == 'sign_in_failed'){
-        // TODO: Can be improved
-        return OperationResponse(102, true, error.details);
-      }
-      else{
-        // Unknown error
-        return OperationResponse(100, true, error.toString());
-      }
+      return OperationResponse(104, true, error.toString());
     }
   }
 
-  static Future<OperationResponse> initialUserDocument(FirebaseUser user, {String nickname}) async{
+  static Future<OperationResponse> sendFriendRequest({@required UserProfile receiverUserProfile}) async{
 
     try{
 
-      Query query = Firestore.instance.collection('users').where('uid', isEqualTo: user.uid);
-      QuerySnapshot snapshot = await query.getDocuments();
+      UserProfile senderUserProfile = GlobalState.userProfile;
 
-      if (snapshot.documents.length > 0){
-        // Document found, no need to do initialization
-        return OperationResponse.ok;
-      }
-      else{
-        // Document not found, create one instead
-        await Firestore.instance.collection('users').add({
-          'uid': user.uid,
-          'email': user.email,
-          'nickname': nickname == null ? 'Anonymous' : nickname
-        });
-        debugPrint('[User Data] New User document is created');
-        return OperationResponse(51, false, 'OK');
-      }
-    }
-    catch (error){
+      // debugPrint('Prepare to send friend request to ${receiverUserProfile.uid}, documentID: ${receiverUserProfile.documentID}');
 
-      debugPrint('[User Data] Error occur during initialing user document');
-      return OperationResponse(105, true, 'Operation Error');
+      List<dynamic> result = await CloudFunctions.instance.call(
+        functionName: 'sendFriendRequest',
+        parameters: {
+          'senderUID': senderUserProfile.uid,
+          //'senderDocumentID': senderUserProfile.documentID,
+          'receiverUID': receiverUserProfile.uid,
+          //'receiverDocumentID': receiverUserProfile.documentID,
+        }
+      );
+
+      debugPrint('${result.last}');
+      return OperationResponse(20, false, 'Success');
     }
+    catch(error){
+      debugPrint(error.toString());
+      return OperationResponse(104, true, error.toString());
+    }
+
   }
 }
 

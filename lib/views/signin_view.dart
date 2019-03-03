@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:life_moment/data_structures/system_data.dart';
 import 'package:life_moment/forms/signin_form.dart';
+import 'package:life_moment/services/operation_management.dart';
 import 'package:life_moment/views/debug_setting_view.dart';
 
 class SignInView extends StatefulWidget {
@@ -9,8 +11,6 @@ class SignInView extends StatefulWidget {
     return new _SignInViewState();
   }
 }
-
-
 
 class _SignInViewState extends State<SignInView> {
 

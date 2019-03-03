@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:life_moment/services/operation_management.dart';
 
 import 'package:life_moment/views/search_view.dart';
 import 'package:life_moment/widgets/router_widgets.dart';
@@ -6,6 +7,11 @@ import 'package:life_moment/widgets/router_widgets.dart';
 
 class DashboardSearchBar extends StatefulWidget {
 
+  DashboardSearchBar({this.searchable = false, this.onSubmitted, this.onClear});
+  final bool searchable;
+  // final GlobalKey<SearchViewState> key;
+  final void Function(String) onSubmitted;
+  final void Function() onClear;
 
 
   @override
@@ -24,15 +30,24 @@ class _DashboardSearchBarState extends State<DashboardSearchBar> {
     Navigator.push(context, SlidePageRoute(widget: SearchView(), offset: SlideDirection.up));
   }
 
+  void onClearPressed(){
+    _searchFieldController.text = '';
+
+    if (widget.onClear != null){
+      widget.onClear();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return FlatButton(
+      //color: Colors.red,
       padding: EdgeInsets.all(0),
-      onPressed: onPressed,
+      onPressed: widget.searchable ? null : onPressed,
       child: Container(
 
         // This Control the height of the child container
-        margin: const EdgeInsets.symmetric(vertical: 10),
+        margin: const EdgeInsets.symmetric(vertical: 6),
         //height: 28,
 
         decoration: BoxDecoration(
@@ -41,17 +56,34 @@ class _DashboardSearchBarState extends State<DashboardSearchBar> {
         ),
 
         // child: Expanded(
-          child: TextField(
+          
+        child: TextField(
+          
+          controller: _searchFieldController,
+          enabled: widget.searchable,
+          decoration: InputDecoration(
+            contentPadding: const EdgeInsets.only(top:4),
+            border: InputBorder.none,
+            hintText: 'Search',
+            prefixIcon: const Icon(Icons.search, size:20),
             
-            controller: _searchFieldController,
-            enabled: false,
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              hintText: 'Search',
-              prefixIcon: const Icon(Icons.search)
-            ),
-
+            //fillColor: Colors.yellow,
+            //filled: true,
+            suffixIcon: widget.searchable 
+              ? IconButton(
+                padding: const EdgeInsets.all(0),
+                icon: Icon(
+                  Icons.cancel,
+                  size: 20,
+                ),
+                onPressed: onClearPressed
+              )
+              : null,
           ),
+          textInputAction: TextInputAction.search,
+          onSubmitted: widget.onSubmitted,
+          style: TextStyle(fontSize: 16)
+        ),
         //),
       ),
     );

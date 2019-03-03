@@ -3,8 +3,9 @@ import 'package:life_moment/data_structures/mood_data.dart';
 import 'package:life_moment/data_structures/news_feed_data.dart';
 import 'package:life_moment/data_structures/system_data.dart';
 import 'package:life_moment/forms/form_widgets/form_section.dart';
-import 'package:life_moment/services/data_management.dart';
+import 'package:life_moment/services/post_management.dart';
 import 'package:life_moment/state.dart';
+import 'package:life_moment/widgets/loading_modal.dart';
 
 
 
@@ -47,13 +48,6 @@ class NewPostFormState extends State<NewPostForm> {
     });
   }
 
-  // void setLoadingState(bool state){
-    
-  //   setState((){
-  //     _isLoading = state;
-  //   });
-  // }
-
   Color currentBackgroundColor(){
 
     if (_currentMood == null) return Colors.white;
@@ -82,6 +76,7 @@ class NewPostFormState extends State<NewPostForm> {
 
     clearFieldFocus();
 
+    // Set warning messgae
     if (_currentMood.moodType == MoodType.Undefined){
       setState((){
         _emptyMoodWarningMessage = 'Please Select a mood';
@@ -89,64 +84,36 @@ class NewPostFormState extends State<NewPostForm> {
       return;
     }
 
+    setState((){
+      _failSubmitPostMessage = '';
+    });
+
     debugPrint('[New Post] Form field check passed');
 
+    // Show the loading modal
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return Material(
-
-          type: MaterialType.transparency,
-          //color: Colors.white,
-
-          child: Center(
-            child: Container(
-
-              width: 180,
-              height:150,
-              color: Colors.white,
-              child: Column(
-
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text(
-                    'Loading...', 
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.black
-                    )
-                  ),
-                  
-                  Padding(padding: const EdgeInsets.symmetric(vertical: 10),),
-
-                  CircularProgressIndicator()
-                ]
-              ),
-            ),
-          )
-        );
-      }
+      builder: (BuildContext context) => LoadingModal()
     );
 
     // Prepare post data
-    PostData data = PostData(mood: _currentMood, description: _descriptionFieldController.text);
-    // NewsFeedData data = NewsFeedData(mood: _currentMood, description: _descriptionFieldController.text);
+    PostData data = PostData(
+      mood: _currentMood, 
+      description: _descriptionFieldController.text
+    );
 
-    OperationResponse response = await DataManagement.submitNewPost(data);
+    OperationResponse response = await PostManagement.createNewPost(data);
 
     // Dismiss the modal
     Navigator.pop(context);
 
-
     if (response.isError){
       // Fail, show error message
-
       setState((){
         _failSubmitPostMessage = response.message;
       });
     }
     else{
-    
       // Success, return to home
       Navigator.pop(context);
     }
@@ -164,186 +131,206 @@ class NewPostFormState extends State<NewPostForm> {
         //crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
 
-          _failSubmitPostMessage == ''
-          ? Container()
-          : FormSection(
+          _buildErrorMessgaeSection(),
+          
+          _buildProfileSection(),
+          
+          _buildMoodSelectionSection(),
 
-              children: <Widget>[
-                Text(_failSubmitPostMessage, style: TextStyle(color: Colors.red),)
-              ]
-            ),
+          _buildIntensitySelectionSection(),
 
-          FormSection(
-            
-            // List Tile default have padding
-            padding: EdgeInsets.all(0),
-            children: <Widget>[
-
-              ListTile(
-
-                leading: CircleAvatar(),
-                title: Text(GlobalState.userProfile.nickname),
-                subtitle: Text('Hello! World?'),
-              ),
-              
-
-            ],
-          ),
-
-
-          FormSection(
-
-            children: <Widget>[
-
-              Container(
-                margin: EdgeInsets.only(bottom: 8),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children:<Widget>[
-
-
-                    Text(
-                      'Hows your mood?',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                      )
-                    ),
-
-                    this._currentMood == null 
-                      ? Container()
-                      : Text('${_currentMood.moodTypeString}')
-
-                  ]
-                ),
-              ),
-
-              this._emptyMoodWarningMessage == ''
-               ? Container()
-               : Text('$_emptyMoodWarningMessage', style: TextStyle(color: Colors.red),),
-            
-              Container(
-                // margin: EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(50),
-                  color: Colors.teal[100],
-                ),
-
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-
-                    IconButton(
-                      onPressed: (){onMoodSelected(0);},
-                      icon: Icon(Icons.sentiment_very_dissatisfied),
-                      color: _currentMood.moodType == MoodType.VeryUnhappy ? _currentMood.moodRawColor : Colors.black,
-                    ),
-                    IconButton(
-                      onPressed: (){onMoodSelected(1);},
-                      icon: Icon(Icons.sentiment_dissatisfied),
-                      color: _currentMood.moodType == MoodType.Unhappy ? _currentMood.moodRawColor : Colors.black,
-                    ),
-                    IconButton(
-                      onPressed: (){onMoodSelected(2);},
-                      icon: Icon(Icons.sentiment_neutral),
-                      color: _currentMood.moodType == MoodType.Neutral ? _currentMood.moodRawColor : Colors.black,
-                    ),
-                    IconButton(
-                      onPressed: (){onMoodSelected(3);},
-                      icon: Icon(Icons.sentiment_satisfied),
-                      color: _currentMood.moodType == MoodType.Happy ? _currentMood.moodRawColor : Colors.black,
-                    ),
-                    IconButton(
-                      onPressed: (){onMoodSelected(4);},
-                      icon: Icon(Icons.sentiment_very_satisfied),
-                      color: _currentMood.moodType == MoodType.VeryHappy ? _currentMood.moodRawColor : Colors.black,
-                    )
-
-                  ],
-                )
-              )
-            ]
-          ),
-
-          // TODO: Can add some emotion phrase
-
-          FormSection(
-
-            children: <Widget>[
-
-              Container(
-                margin: EdgeInsets.only(bottom: 8),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children:<Widget>[
-
-
-                    Text(
-                      'How strong is your mood?',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                      )
-                    ),
-
-                    this._currentMood == null 
-                      ? Container()
-                      : Text('${_currentMood.intensity}')
-
-                  ]
-                ),
-              ),
-              Slider(
-                
-                min: 0,
-                max: 100,
-                divisions: 100,
-                onChanged: this._currentMood.moodType == null 
-                  ? null
-                  : (val){onIntensityChanged(val.round());},
-                // onChanged: null,
-                value: _currentMood.intensity.toDouble(),
-              )
-            ],  
-
-          ),
-
-          FormSection(
-
-            children: <Widget>[
-
-              Container(
-                margin: EdgeInsets.only(bottom: 8),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children:<Widget>[
-
-                    Text(
-                      'Description',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                      )
-                    ),
-                  ]
-                ),
-              ),
-
-              TextField(
-                controller: _descriptionFieldController,
-                textInputAction: TextInputAction.newline,
-                focusNode: _descriptionFieldFocusNode,
-                onTap: (){
-                  clearFieldFocus();
-                },
-                maxLength: 1000,
-                maxLines: null,
-
-              )
-            ],
-          ),
-
-
+          _buildDescriptionSection(),
 
         ],
       )
+    );
+  }
+
+  Widget _buildErrorMessgaeSection(){
+
+    if (_failSubmitPostMessage == ''){
+      return Container();
+    }
+  
+    return FormSection(
+
+      children: <Widget>[
+        Text(_failSubmitPostMessage, style: TextStyle(color: Colors.red),)
+      ]
+    );
+  }
+
+  Widget _buildProfileSection(){
+
+    UserProfile userProfile = GlobalState.userProfile;
+    return FormSection(
+            
+      // List Tile default have padding
+      padding: EdgeInsets.all(0),
+      children: <Widget>[
+
+        ListTile(
+
+          leading: CircleAvatar(
+            backgroundImage: NetworkImage(userProfile.avatarURL),
+          ),
+          title: Text(userProfile.nickname),
+          subtitle: Text('Hello! World?'),
+        ),
+        
+
+      ],
+    );
+  }
+
+  Widget _buildMoodSelectionSection(){
+
+    return FormSection(
+
+      children: <Widget>[
+
+        Container(
+          margin: EdgeInsets.only(bottom: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children:<Widget>[
+
+              Text(
+                'Hows your mood?',
+                style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                )
+              ),
+
+              this._currentMood == null 
+                ? Container()
+                : Text('${_currentMood.moodTypeString}')
+
+            ]
+          ),
+        ),
+
+        this._emptyMoodWarningMessage == ''
+          ? Container()
+          : Text('$_emptyMoodWarningMessage', style: TextStyle(color: Colors.red),),
+      
+        Container(
+          // margin: EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(50),
+            color: Colors.teal[100],
+          ),
+
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+
+              IconButton(
+                onPressed: (){onMoodSelected(0);},
+                icon: Icon(Icons.sentiment_very_dissatisfied),
+                color: _currentMood.moodType == MoodType.VeryUnhappy ? _currentMood.moodRawColor : Colors.black,
+              ),
+              IconButton(
+                onPressed: (){onMoodSelected(1);},
+                icon: Icon(Icons.sentiment_dissatisfied),
+                color: _currentMood.moodType == MoodType.Unhappy ? _currentMood.moodRawColor : Colors.black,
+              ),
+              IconButton(
+                onPressed: (){onMoodSelected(2);},
+                icon: Icon(Icons.sentiment_neutral),
+                color: _currentMood.moodType == MoodType.Neutral ? _currentMood.moodRawColor : Colors.black,
+              ),
+              IconButton(
+                onPressed: (){onMoodSelected(3);},
+                icon: Icon(Icons.sentiment_satisfied),
+                color: _currentMood.moodType == MoodType.Happy ? _currentMood.moodRawColor : Colors.black,
+              ),
+              IconButton(
+                onPressed: (){onMoodSelected(4);},
+                icon: Icon(Icons.sentiment_very_satisfied),
+                color: _currentMood.moodType == MoodType.VeryHappy ? _currentMood.moodRawColor : Colors.black,
+              )
+
+            ],
+          )
+        )
+      ]
+    );
+  }
+
+  Widget _buildIntensitySelectionSection(){
+
+    return FormSection(
+
+      children: <Widget>[
+        Container(
+          margin: EdgeInsets.only(bottom: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children:<Widget>[
+
+              Text(
+                'How strong is your mood?',
+                style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                )
+              ),
+
+              this._currentMood == null 
+                ? Container()
+                : Text('${_currentMood.intensity}')
+
+            ]
+          ),
+        ),
+        Slider(         
+          min: 0,
+          max: 100,
+          divisions: 100,
+          onChanged: this._currentMood.moodType == null 
+            ? null
+            : (val){onIntensityChanged(val.round());},
+          // onChanged: null,
+          value: _currentMood.intensity.toDouble(),
+        )
+      ],  
+    );
+  }
+
+  Widget _buildDescriptionSection(){
+
+    return FormSection(
+
+      children: <Widget>[
+
+        Container(
+          margin: EdgeInsets.only(bottom: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children:<Widget>[
+
+              Text(
+                'Description',
+                style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                )
+              ),
+            ]
+          ),
+        ),
+
+        TextField(
+          controller: _descriptionFieldController,
+          textInputAction: TextInputAction.newline,
+          focusNode: _descriptionFieldFocusNode,
+          onTap: (){
+            clearFieldFocus();
+          },
+          maxLength: 1000,
+          maxLines: null,
+
+        )
+      ],
     );
   }
 

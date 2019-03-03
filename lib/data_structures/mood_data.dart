@@ -117,6 +117,7 @@ class Mood {
     Icon result = Icon(
       _codeIconMap[_typeCode],
       color: _codeColorMap[_typeCode],
+      semanticLabel: 'hi',
     );
     if (result == null) return Icon(Icons.error_outline);
 

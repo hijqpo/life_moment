@@ -2,7 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:life_moment/data_structures/system_data.dart';
-import 'package:life_moment/services/user_management.dart';
+import 'package:life_moment/services/auth_management.dart';
+import 'package:life_moment/widgets/loading_modal.dart';
 
 class SignUpForm extends StatefulWidget {
 
@@ -33,11 +34,20 @@ class _SignUpFormState extends State<SignUpForm> {
 
     debugPrint('Sign Up is pressed');
     if (_formKey.currentState.validate()){
+
       debugPrint('[Login Form] Local form field check passed');
       _formKey.currentState.save();
 
-      _loading = true;
-      OperationResponse response = await UserManagement.signUp(email: _email, password: _password, nickname: _nickname);
+      // Show Loading Modal
+      showDialog(
+        context: context,
+        builder: (BuildContext context) => LoadingModal()
+      );
+
+      OperationResponse response = await AuthManagement.signUp(email: _email, password: _password, nickname: _nickname);
+
+      // DIsmiss the modal
+      Navigator.pop(context);
 
       if (response.isError){
         setState((){
@@ -48,15 +58,10 @@ class _SignUpFormState extends State<SignUpForm> {
         setState(() {
           _errorMessage = '';
           Navigator.pop(context);
-          
         });
-      }
-
-      _loading = false;
+      }      
     }
   }
-
-
 
   @override
   Widget build(BuildContext context) {

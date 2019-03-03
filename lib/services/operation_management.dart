@@ -9,34 +9,46 @@ import 'package:life_moment/state.dart';
 
 class OperationManagement {
 
-  /// Mark the post as Noticed or unmark it if it is already noticed
-  /// 
-  /// [postDocumentID]: The document ID of the of the post, can be retrive in NewsFeedData
-  /// 
-  static Future<OperationResponse> noticePost({@required postDocumentID, @required postOwnerDocumentID}) async {
+  static Future<OperationResponse> exceptionPlayground() async{
 
-    String uid = GlobalState.userProfile.uid;
+    try {
 
-    try{
+      OperationResponse res = await CloudFunctions.instance.call(
+        functionName: 'exceptionPlayground',
+        parameters: {
+          'testCase': 'd',
+        }
+      );
 
-      debugPrint('Noticing the following post: \n -- Post Document ID: $postDocumentID\n -- Post Owner Document ID: $postOwnerDocumentID\n -- UID: $uid ');
-      await CloudFunctions.instance.call(functionName: 'noticePost', parameters: {
+      debugPrint('WTF?? $res');
 
-        'uid': uid,
-        'postDocumentID': postDocumentID,
-        'postOwnerDocumentID': postOwnerDocumentID
-      });
 
-      return OperationResponse(20, false, 'Success');
-
+      return OperationResponse.ok;
     }
-    catch(error){
-      debugPrint(error.toString());
-      return OperationResponse(104, true, error.toString());
+    catch (error){
+
+      debugPrint('Hello from catch block ${error.toString()}');
+      debugPrint('Hello from catch block ${error.code}');
+      debugPrint('Hello from catch block ${error.message}');
+      return OperationResponse.ok;
     }
   }
 
+  static Future<OperationResponse> clearAllPosts({String keyword}) async{
 
+    try {
 
+      OperationResponse res = await CloudFunctions.instance.call(
+        functionName: 'clearAllPosts',
+      );
+      return OperationResponse.ok;
+    }
+    catch (error){
 
+      debugPrint('Hello from catch block ${error.toString()}');
+      debugPrint('Hello from catch block ${error.code}');
+      debugPrint('Hello from catch block ${error.message}');
+      return OperationResponse.ok;
+    }
+  }
 }

@@ -1,29 +1,36 @@
-import 'package:charts_flutter/flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:life_moment/data_structures/friend_data.dart';
 import 'package:life_moment/data_structures/system_data.dart';
+import 'package:life_moment/services/operation_management.dart';
 import 'package:life_moment/services/user_management.dart';
-
 import 'package:life_moment/state.dart';
 
+// Widget
 
-class ProfileView extends StatefulWidget {
+// data
+import 'package:charts_flutter/flutter.dart';
 
-  ProfileView({this.profile});
+
+class FriendProfileView extends StatefulWidget {
+
+  FriendProfileView({@required this.profile});
 
   final UserProfile profile;
+  //final Relationship relationship;
 
   @override
-  _ProfileViewState createState() => _ProfileViewState();
+  State<StatefulWidget> createState() {
+    return new _FriendProfileViewState();
+  }
 }
 
-class _ProfileViewState extends State<ProfileView> {
+class _FriendProfileViewState extends State<FriendProfileView> {
 
-  bool chartAnimated = true;
+
+
   RelationshipStatus currentRelationshipStatus;
-
-
-  
+  bool chartAnimated = true;
+  // bool loading
 
   Future<void> _onAddFriendPressed() async{
 
@@ -47,27 +54,7 @@ class _ProfileViewState extends State<ProfileView> {
 
 
 
-
-  @override
-  Widget build(BuildContext context) {
-
-    return Center(
-      
-      child: Column(
-        children: <Widget>[
-
-          _buildMoodChart(),
-          _buildBasicProfile(),
-
-          Divider(),
-
-        ],
-      )
-    );
-  }
-
-
-  Widget _buildFriendOperationWidget(){
+  Widget buildFriendOperationWidget(){
 
     // Handle Exception situation
     if (currentRelationshipStatus == null || currentRelationshipStatus == RelationshipStatus.Unknown){
@@ -149,7 +136,13 @@ class _ProfileViewState extends State<ProfileView> {
 
 
 
-  Widget _buildMoodChart(){
+
+  @override
+  Widget build(BuildContext context) {
+
+    UserProfile profile = widget.profile;
+    String nickname = profile.nickname;
+    String photoURL = profile.avatarURL;
 
     final myFakeDesktopData = [
       new LinearSales(0, 0),
@@ -173,52 +166,100 @@ class _ProfileViewState extends State<ProfileView> {
         radiusPxFn: (_, __) => 3
       )
     ];
-    return Container(
-      height: 130,
-      child: LineChart(
-        chartData, 
-        animate: chartAnimated, 
-        defaultRenderer: LineRendererConfig(includePoints: true), 
-        domainAxis: NumericAxisSpec(
-          showAxisLine: true, 
-          renderSpec: NoneRenderSpec()
-        ),
-      )
-    );
-  }
 
-  Widget _buildBasicProfile(){
 
-    String _avatarURL = widget.profile.avatarURL;
-    String _nickname = widget.profile.nickname;
-
-    return Column(
-      children: <Widget>[
-        CircleAvatar(
-          backgroundImage: NetworkImage(_avatarURL),
-          radius: 48,
-        ),
-        Padding(padding: const EdgeInsets.symmetric(vertical: 6),),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Container(),
-            Text(
-              '$_nickname',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)
-            ),
-            Container()
-          ],
-        ),
+    return Scaffold(
       
-      ]
+      appBar: PreferredSize(
+        preferredSize: Size(0, 40),
+        child: AppBar(
+
+          title: Text(
+            '$nickname\'s Profile',
+            style: TextStyle(fontWeight: FontWeight.w500)
+          ),
+        ),
+      ),
+
+      body: Container(
+
+        padding: const EdgeInsets.all(20),
+
+        child: Center(
+
+          child: Column(
+          
+            crossAxisAlignment: CrossAxisAlignment.center,
+            //mainAxisAlignment: MainAxisAlignment.center,
+            
+            children: <Widget>[
+
+              Stack(
+                children: <Widget>[
+
+                  Container(
+                    height: 130,
+                    child: LineChart(
+                      chartData, 
+                      animate: chartAnimated, 
+                      defaultRenderer: LineRendererConfig(includePoints: true), 
+                      domainAxis: NumericAxisSpec(
+                        showAxisLine: true, 
+                        renderSpec: NoneRenderSpec()
+                      ),
+                    )
+                  ),
+                  
+
+                  Positioned (
+                    
+                    child: Align(
+                      alignment: Alignment.bottomCenter,
+                      heightFactor: 1.8,
+                      child: Column(
+                        children: <Widget>[
+                          CircleAvatar(
+                            backgroundImage: NetworkImage(photoURL),
+                            radius: 48,
+                          ),
+                          Padding(padding: const EdgeInsets.symmetric(vertical: 6),),
+                          Text(
+                                '$nickname',
+                                style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)
+                              ),
+
+                        ]
+                      )
+                    )
+                  ),
+                ],
+              ),
+
+              Divider(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  
+                  buildFriendOperationWidget()
+                ]
+              ),
+   
+
+            ]
+          ),
+        ),
+      ) 
     );
   }
 
-  Widget _buildRelationship(){
 
-  }
+
+  
 }
+
+
+
+
 
 class LinearSales {
   final int year;
