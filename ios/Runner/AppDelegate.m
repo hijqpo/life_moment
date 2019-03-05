@@ -8,10 +8,14 @@
     didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
   [GeneratedPluginRegistrant registerWithRegistry:self];
   
-    if ([FIRApp defaultApp] == nil){
+    FIRApp* appInstance = [FIRApp defaultApp];
+    if (appInstance == nil){
         [FIRApp configure];
-    
     }
+    else{
+        
+    }
+    //[FIRApp configure];
   // Override point for customization after application launch.
   return [super application:application didFinishLaunchingWithOptions:launchOptions];
 }

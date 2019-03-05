@@ -21,9 +21,8 @@ class GlobalState {
   static UserProfile get userProfile {
 
     Map<String, dynamic> dataMap = userProfileSnapshot.data.documents[0].data;
-
     dataMap['documentID'] = userProfileSnapshot.data.documents[0].documentID;
-    return UserProfile(dataMap: dataMap);
+    return UserProfile.createFormDataMap(dataMap: dataMap);
   }
 
 

@@ -1,17 +1,16 @@
 import 'package:charts_flutter/flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:life_moment/data_structures/friend_data.dart';
 import 'package:life_moment/data_structures/system_data.dart';
+import 'package:life_moment/services/auth_management.dart';
 import 'package:life_moment/services/user_management.dart';
 
 import 'package:life_moment/state.dart';
+import 'package:life_moment/views/edit_profile_view.dart';
 
 
 class ProfileView extends StatefulWidget {
-
-  ProfileView({this.profile});
-
-  final UserProfile profile;
 
   @override
   _ProfileViewState createState() => _ProfileViewState();
@@ -23,30 +22,21 @@ class _ProfileViewState extends State<ProfileView> {
   RelationshipStatus currentRelationshipStatus;
 
 
-  
+  void _onSignOutPressed(){
 
-  Future<void> _onAddFriendPressed() async{
-
-    debugPrint('[Friend Profile] Add Friend Pressed');
-    OperationResponse response = await UserManagement.sendFriendRequest(receiverUserProfile: widget.profile);
-    debugPrint('${response.toString()}');
-    setState((){
-      chartAnimated = false;
-      currentRelationshipStatus = RelationshipStatus.SentRequest;
-    });
+    AuthManagement.signOut();
   }
 
-  void _onAcceptFriendPressed(){
-
-    debugPrint('[Friend Profile] Accept Friend Pressed');
-    setState((){
-      chartAnimated = false;
-      currentRelationshipStatus = RelationshipStatus.Friend;
-    });
+  void _onEditProfilePressed(){
+    Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => EditProfileView()));
   }
 
+  Future<void> _onRefresh(){
 
-
+    //setState((){});
+    //setState((){Scaffold.of(context).setState((){});});
+    return Future.value();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,98 +46,32 @@ class _ProfileViewState extends State<ProfileView> {
       child: Column(
         children: <Widget>[
 
-          _buildMoodChart(),
-          _buildBasicProfile(),
+          _buildProfile(),
 
-          Divider(),
+          Divider(height: 0,),
+
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: _onRefresh,
+              child: ListView(
+                
+                children: <Widget>[
+                 _buildMoodChart(),
+                ],
+              )
+            ),
+          ),
+         
+          // _buildBasicProfile(),
+
+          Divider(height: 0),
+          _buildSignOutButton(),
+          // _buildStatContainer(),
 
         ],
       )
     );
   }
-
-
-  Widget _buildFriendOperationWidget(){
-
-    // Handle Exception situation
-    if (currentRelationshipStatus == null || currentRelationshipStatus == RelationshipStatus.Unknown){
-      debugPrint('[Friend Profile] No Relationship data found - Disabled friend operation');
-      return 
-        Column(
-          children: <Widget>[
-            Icon( Icons.person_add,),
-            Text('<Disabled>', style: TextStyle(color: Colors.red))
-          ],
-        );
-    }
-
-    if (currentRelationshipStatus == RelationshipStatus.Stranger){
-      return 
-        FlatButton(
-          onPressed: _onAddFriendPressed,
-          child: Column(
-            children: <Widget>[
-              Icon(
-                Icons.person_add,
-              ),
-              Text('Add Friend')
-            ],
-          )
-        );
-    }
-
-    if (currentRelationshipStatus == RelationshipStatus.Friend){
-      return 
-        FlatButton(
-          onPressed: (){},
-          child: Column(
-            children: <Widget>[
-              Icon(
-                Icons.person,
-                color: Colors.blue[300]
-              ),
-              Text('Friend')
-            ],
-          )
-        );
-    }
-
-    if (currentRelationshipStatus == RelationshipStatus.SentRequest){
-      return 
-        FlatButton(
-          // TODO: Add remove 
-          onPressed: (){},
-          child: Column(
-            children: <Widget>[
-              Icon(
-                Icons.send,
-                color: Colors.blue
-              ),
-              Text('Friend Request Sent')
-            ],
-          )
-        );
-    }
-
-    if (currentRelationshipStatus == RelationshipStatus.ReceivedRequest){
-      return 
-        FlatButton(
-          onPressed: _onAcceptFriendPressed,
-          child: Column(
-            children: <Widget>[
-              Icon(
-                Icons.done,
-              ),
-              Text('Accept Friend Request')
-            ],
-          )
-        );
-    }
-
-    return Container();
-  }
-
-
 
   Widget _buildMoodChart(){
 
@@ -173,50 +97,190 @@ class _ProfileViewState extends State<ProfileView> {
         radiusPxFn: (_, __) => 3
       )
     ];
-    return Container(
-      height: 130,
-      child: LineChart(
-        chartData, 
-        animate: chartAnimated, 
-        defaultRenderer: LineRendererConfig(includePoints: true), 
-        domainAxis: NumericAxisSpec(
-          showAxisLine: true, 
-          renderSpec: NoneRenderSpec()
+
+    return ExpansionTile(
+
+      title: Text(
+        'Mood Progress',
+        style: TextStyle(
+          fontWeight: FontWeight.w700
+        )
+      ),
+      children: <Widget>[
+        Container(
+          margin: const EdgeInsets.all(12),
+          height: 120,
+          child: LineChart(
+            chartData, 
+            animate: chartAnimated, 
+            defaultRenderer: LineRendererConfig(includePoints: true), 
+            domainAxis: NumericAxisSpec(
+              showAxisLine: true, 
+              renderSpec: NoneRenderSpec()
+            ),
+          )
         ),
-      )
+      ],
+
+    );
+    
+  }
+
+  Widget _buildProfile(){
+
+    UserProfile profile = GlobalState.userProfile;
+    String _avatarURL = profile.avatarURL;
+    String _nickname = profile.nickname;
+
+    return Container(
+
+      padding: const EdgeInsets.all(8),
+      child: Column(
+        
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children:<Widget>[ 
+          
+          ListTile(
+
+            leading: CircleAvatar(
+              backgroundImage: NetworkImage(_avatarURL),
+              radius: 40,
+            ),
+
+            title: Padding(
+              padding: const EdgeInsets.only(top: 10.0),
+              child: _buildStatContainer(),
+            ),
+
+            subtitle: _buildEditProfileButton(),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.only(left: 16.0, top: 10),
+            child: Text(
+              '$_nickname',
+              style: TextStyle(
+                fontSize: 24, 
+                fontWeight: FontWeight.w500
+              )
+            ),
+          ),
+        ]
+      ),
     );
   }
 
-  Widget _buildBasicProfile(){
+  Widget _buildStatContainer(){
 
-    String _avatarURL = widget.profile.avatarURL;
-    String _nickname = widget.profile.nickname;
+    UserProfile profile = GlobalState.userProfile;
 
-    return Column(
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: <Widget>[
-        CircleAvatar(
-          backgroundImage: NetworkImage(_avatarURL),
-          radius: 48,
-        ),
-        Padding(padding: const EdgeInsets.symmetric(vertical: 6),),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Container(),
-            Text(
-              '$_nickname',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)
+
+        _buildStatItem(label: 'Friends', count: profile.friendCount.toString()),
+        _buildStatItem(label: 'Posts', count: profile.postCount.toString()),
+        _buildStatItem(label: 'Score', count: profile.score.toString())
+      ],
+    );
+  }
+
+  Widget _buildStatItem({String label, String count}){
+
+    return FlatButton(
+      onPressed: (){},
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            count,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: Colors.black54
             ),
-            Container()
-          ],
-        ),
-      
-      ]
+          ),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: Colors.black54
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildRelationship(){
 
+  }
+
+  Widget _buildSignOutButton(){
+
+    return FlatButton(  
+      onPressed: _onSignOutPressed,
+      child: Row(
+
+        children: <Widget>[
+
+          Icon(
+            FontAwesomeIcons.signOutAlt
+          ),
+          Padding(padding: const EdgeInsets.symmetric(horizontal: 8),),
+          Expanded(
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Sign Out',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700
+                )
+              ),
+            )
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEditProfileButton(){
+
+    return Row(
+
+      children: <Widget>[
+        Expanded(
+          child: Container(
+            
+            height: 30,
+            margin: const EdgeInsets.only(top: 8),
+            // padding: const EdgeInsets.all(0),
+            // color: Colors.black38,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: Colors.black45)
+            ),
+            
+            child: FlatButton(
+              padding: const EdgeInsets.all(0),
+              onPressed: _onEditProfilePressed,
+
+              child: Center(
+                child: Text(
+                  'Edit Profile',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700
+                  )
+                ),
+              ),
+            ),
+          )
+        ),
+      ]
+    );
   }
 }
 

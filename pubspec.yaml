@@ -22,12 +22,15 @@ dependencies:
   material_search: ^0.2.8
 
   font_awesome_flutter:
+  image_picker: 0.5.0+3
+
 
   # Firebase
-  firebase_auth: ^0.6.6
-  google_sign_in: ^3.2.4
-  cloud_firestore: ^0.8.2+3
-  cloud_functions: ^0.1.0+1
+  firebase_auth: '^0.8.1+4'
+  google_sign_in: '^3.2.4'
+  cloud_firestore: '^0.9.5+2'
+  cloud_functions: '0.1.0+1'
+  firebase_storage: '^2.1.0+1'
 
   # Charts
   charts_flutter: ^0.6.0

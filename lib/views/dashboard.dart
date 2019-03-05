@@ -47,7 +47,7 @@ class _DashboardState extends State<Dashboard> {
     Text('Index 1: ??????'),
     Text('Index 2: Life Moment'),
     ChartView(),
-    ProfileView(profile: GlobalState.userProfile),
+    ProfileView(),
   ];
 
   _onNavItemTapped(int index){
@@ -68,14 +68,14 @@ class _DashboardState extends State<Dashboard> {
         child:  AppBar(
           title: DashboardSearchBar(),
 
-          leading: IconButton(
-            icon: Icon(
-              FontAwesomeIcons.signOutAlt,
-              size: 20,  
-            ),
-            tooltip: 'Sign out',
-            onPressed: AuthManagement.signOut,
-          ),
+          // leading: IconButton(
+          //   icon: Icon(
+          //     FontAwesomeIcons.signOutAlt,
+          //     size: 20,  
+          //   ),
+          //   tooltip: 'Sign out',
+          //   onPressed: AuthManagement.signOut,
+          // ),
 
           actions: <Widget>[
             IconButton(

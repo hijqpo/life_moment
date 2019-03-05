@@ -60,18 +60,15 @@ class UserProfile {
     );
   }
 
-  factory UserProfile({Map<String, dynamic> dataMap}){
+  // UserProfile({Map<String, dynamic> dataMap}){
 
-    String uidKey = dataMap['uid'];
-    if (_cache.containsKey(dataMap['uid'])){
-      return _cache[uidKey];
-    }
-    else{
-      final UserProfile instanceUserProfile = UserProfile.createFormDataMap(dataMap: dataMap);
-      _cache[uidKey] = instanceUserProfile;
-      return instanceUserProfile;
-    }
-  }
+  //   String uidKey = dataMap['uid'];
+
+  //     final UserProfile instanceUserProfile = UserProfile.createFormDataMap(dataMap: dataMap);
+  //     _cache[uidKey] = instanceUserProfile;
+  //     return instanceUserProfile;
+    
+  // }
 
   UserProfile._internal({
     @required this.documentID, 
