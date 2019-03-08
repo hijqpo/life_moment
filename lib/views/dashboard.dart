@@ -12,12 +12,12 @@ import 'package:life_moment/views/home_view.dart';
 import 'package:life_moment/views/chart_view.dart';
 import 'package:life_moment/views/profile_view.dart';
 import 'package:life_moment/widgets/dashboard_search_bar.dart';
-import 'package:life_moment/views/notification_view.dart';
+import 'package:life_moment/views/map_view.dart';
 
 const List<String> Titles = [
   'Home',
   'Friend',
-  'Life Moment',
+  'Map',
   'Notification',
   'Profile'
 ];
@@ -45,7 +45,7 @@ class _DashboardState extends State<Dashboard> {
     HomeView(),
     // FriendProfileView(),
     Text('Index 1: ??????'),
-    Text('Index 2: Life Moment'),
+    MapView(),
     ChartView(),
     ProfileView(),
   ];
@@ -126,7 +126,7 @@ class _DashboardState extends State<Dashboard> {
           items: <BottomNavigationBarItem>[
             BottomNavigationBarItem(icon: Icon(Icons.home), title: Text('Home')),
             BottomNavigationBarItem(icon: Icon(Icons.group), title: Text('Friend')),
-            BottomNavigationBarItem(icon: Icon(Icons.calendar_today), title: Text('Life Moment')),
+            BottomNavigationBarItem(icon: Icon(Icons.map), title: Text('Map')),
             BottomNavigationBarItem(icon: Icon(Icons.insert_chart), title: Text('Chart')),
             BottomNavigationBarItem(icon: Icon(Icons.person), title: Text('Profile')),
           ],

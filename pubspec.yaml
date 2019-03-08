@@ -41,6 +41,9 @@ dependencies:
   # Tuple
   tuple: "^1.0.1"
 
+  # Google Map
+  google_maps_flutter: ^0.0.3+3
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter
