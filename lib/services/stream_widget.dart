@@ -8,10 +8,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 // System
 import 'package:life_moment/state.dart';
 import 'package:life_moment/services/user_management.dart';
+import 'package:life_moment/views/app_views/dashboard/dashboard.dart';
+import 'package:life_moment/views/auth_views/signin_view.dart';
 
 // Views
-import 'package:life_moment/views/dashboard.dart';
-import 'package:life_moment/views/signin_view.dart';
+// import 'package:life_moment/views/dashboard.dart';
+//import 'package:life_moment/views/signin_view.dart';
 
 class StreamWidget {
 

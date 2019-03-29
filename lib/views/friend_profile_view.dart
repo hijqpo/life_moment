@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:life_moment/data_structures/friend_data.dart';
+import 'package:life_moment/data_structures/mood_data.dart';
 import 'package:life_moment/data_structures/system_data.dart';
 import 'package:life_moment/services/operation_management.dart';
 import 'package:life_moment/services/user_management.dart';
@@ -26,11 +27,21 @@ class FriendProfileView extends StatefulWidget {
 
 class _FriendProfileViewState extends State<FriendProfileView> {
 
+  _FriendProfileViewState(){
+    debugPrint('[Friend Profile] initializing...');
+
+    // Load the mood and post data
+  }
 
 
-  RelationshipStatus currentRelationshipStatus;
   bool chartAnimated = true;
+
+  bool _friendOperationLoading = false;
   // bool loading
+
+  Future<void> _load(){
+    
+  }
 
   Future<void> _onAddFriendPressed() async{
 
@@ -39,25 +50,252 @@ class _FriendProfileViewState extends State<FriendProfileView> {
     debugPrint('${response.toString()}');
     setState((){
       chartAnimated = false;
-      currentRelationshipStatus = RelationshipStatus.SentRequest;
+      widget.profile.relationship.status = 'sent_request';
+      GlobalState.appendSearchResult(widget.profile);
     });
   }
 
-  void _onAcceptFriendPressed(){
+  Future<void> _onAcceptFriendPressed() async{
 
     debugPrint('[Friend Profile] Accept Friend Pressed');
+    // TODO: Send request
     setState((){
       chartAnimated = false;
-      currentRelationshipStatus = RelationshipStatus.Friend;
+      widget.profile.relationship.status = 'friend';
+      GlobalState.appendSearchResult(widget.profile);
     });
   }
 
 
 
-  Widget buildFriendOperationWidget(){
+
+  @override
+  Widget build(BuildContext context) {
+
+    UserProfile profile = widget.profile;
+    String nickname = profile.nickname;
+
+    return Scaffold(
+      
+      appBar: PreferredSize(
+        preferredSize: Size(0, 40),
+        child: AppBar(
+
+          title: Text(
+            '$nickname\'s Profile',
+            style: TextStyle(fontWeight: FontWeight.w500)
+          ),
+        ),
+      ),
+
+      body: Center(
+        child: Column(
+        
+          crossAxisAlignment: CrossAxisAlignment.center,
+          //mainAxisAlignment: MainAxisAlignment.center,
+          
+          children: <Widget>[
+            
+            _buildProfile(),
+
+            Divider(),
+
+            _buildGiftStand(),
+
+            Divider(),
+
+            _buildMoodChart(),
+              
+            Divider(),
+
+            _buildPostList(),
+
+            Divider(),
+
+          ]
+        ),
+      ) 
+    );
+  }
+
+
+
+  Widget _buildProfile(){
+
+    UserProfile profile = widget.profile;
+    String _avatarURL = profile.avatarURL;
+    String _nickname = profile.nickname;
+
+    return Container(
+
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16.0),
+      child: Column(
+        
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children:<Widget>[ 
+          
+          ListTile(
+
+            leading: CircleAvatar(
+              backgroundImage: NetworkImage(_avatarURL),
+              radius: 40,
+            ),
+
+            title: Padding(
+              padding: const EdgeInsets.only(top: 10.0),
+              child: _buildStatContainer(),
+            ),
+
+            //subtitle: _buildEditProfileButton(),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 14.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+              
+                Text(
+                  '$_nickname',
+                  style: TextStyle(
+                    fontSize: 24, 
+                    fontWeight: FontWeight.w500
+                  )
+                ),
+
+                _buildFriendOperationWidget()
+              ]
+            ),
+          ),
+        ]
+      ),
+    );
+  }
+
+  Widget _buildStatContainer(){
+
+    UserProfile profile = widget.profile;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: <Widget>[
+
+        _buildStatItem(label: 'Friends', count: profile.friendCount.toString()),
+        _buildStatItem(label: 'Posts', count: profile.postCount.toString()),
+        _buildStatItem(label: 'Score', count: profile.score.toString())
+      ],
+    );
+  }
+
+  Widget _buildStatItem({String label, String count}){
+
+    return FlatButton(
+      onPressed: null,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            count,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: Colors.black54
+            ),
+          ),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: Colors.black54
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMoodChart(){
+
+    final myFakeDesktopData = [
+      // new MoodChartData(DateTime.utc(2019, 2, 1), 0, 50),
+      // new MoodChartData(DateTime.utc(2019, 2, 2), 1, 50),
+      // new MoodChartData(DateTime.utc(2019, 2, 3), 2, 50),
+      // new MoodChartData(DateTime.utc(2019, 2, 4), 3, 50),
+      // new MoodChartData(DateTime.utc(2019, 2, 5), 4, 50),
+      // new MoodChartData(DateTime.utc(2019, 2, 6), 2, 50),
+      // new MoodChartData(DateTime.utc(2019, 2, 7), 3, 50),
+    ];
+
+
+    if (myFakeDesktopData.length == 0){
+      return Container(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+
+            Text(
+              'No Mood Progress',
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 16
+              )
+            ),
+            Padding(padding: const EdgeInsets.symmetric(horizontal: 4.0),),
+            Icon(
+              Icons.sentiment_dissatisfied
+            )
+
+          ],
+        )
+        
+        
+        
+        
+      );
+    }
+
+    List<Series<MoodChartData, DateTime>> chartData = [
+
+      Series<MoodChartData, DateTime>(
+        id: 'Mood',
+        colorFn: (_, __) => MaterialPalette.blue.shadeDefault,
+        domainFn: (MoodChartData mood, _) => mood.time,
+        measureFn: (MoodChartData mood, _) => mood.moodType,
+        data: myFakeDesktopData,
+        fillColorFn: (_, __) => MaterialPalette.green.shadeDefault,
+        radiusPxFn: (MoodChartData mood, __) => 3 + (mood.moodIntensity / 30)
+      )
+    ];
+
+
+    return  Container(
+      height: 130,
+      child: TimeSeriesChart(
+        chartData, 
+        animate: chartAnimated, 
+        defaultRenderer: LineRendererConfig(includePoints: true),
+        domainAxis: DateTimeAxisSpec(
+          showAxisLine: true, 
+          tickFormatterSpec: AutoDateTimeTickFormatterSpec(
+            day: TimeFormatterSpec(
+              format: 'dd',
+              transitionFormat: 'dd MM'
+            )
+          )
+        ),
+      )
+    );
+  }
+  
+  Widget _buildFriendOperationWidget(){
+
+    UserProfile profile = widget.profile;
+    var status = profile.relationship.status;
 
     // Handle Exception situation
-    if (currentRelationshipStatus == null || currentRelationshipStatus == RelationshipStatus.Unknown){
+    if (status == null || status == 'unknown'){
       debugPrint('[Friend Profile] No Relationship data found - Disabled friend operation');
       return 
         Column(
@@ -68,7 +306,7 @@ class _FriendProfileViewState extends State<FriendProfileView> {
         );
     }
 
-    if (currentRelationshipStatus == RelationshipStatus.Stranger){
+    if (status == 'stranger'){
       return 
         FlatButton(
           onPressed: _onAddFriendPressed,
@@ -83,40 +321,33 @@ class _FriendProfileViewState extends State<FriendProfileView> {
         );
     }
 
-    if (currentRelationshipStatus == RelationshipStatus.Friend){
+    if (status == 'friend'){
       return 
-        FlatButton(
-          onPressed: (){},
-          child: Column(
-            children: <Widget>[
-              Icon(
-                Icons.person,
-                color: Colors.blue[300]
-              ),
-              Text('Friend')
-            ],
-          )
+        Column(
+          children: <Widget>[
+            Icon(
+              Icons.person,
+              color: Colors.blue[300]
+            ),
+            Text('Friend')
+          ],
         );
     }
 
-    if (currentRelationshipStatus == RelationshipStatus.SentRequest){
+    if (status ==  'sent_request'){
       return 
-        FlatButton(
-          // TODO: Add remove 
-          onPressed: (){},
-          child: Column(
-            children: <Widget>[
-              Icon(
-                Icons.send,
-                color: Colors.blue
-              ),
-              Text('Friend Request Sent')
-            ],
-          )
+        Column(
+          children: <Widget>[
+            Icon(
+              Icons.send,
+              color: Colors.blue
+            ),
+            Text('Friend Request Sent')
+          ],
         );
     }
 
-    if (currentRelationshipStatus == RelationshipStatus.ReceivedRequest){
+    if (status == 'received_request'){
       return 
         FlatButton(
           onPressed: _onAcceptFriendPressed,
@@ -134,137 +365,45 @@ class _FriendProfileViewState extends State<FriendProfileView> {
     return Container();
   }
 
+  Widget _buildPostList(){
 
-
-
-  @override
-  Widget build(BuildContext context) {
-
-    UserProfile profile = widget.profile;
-    String nickname = profile.nickname;
-    String photoURL = profile.avatarURL;
-
-    final myFakeDesktopData = [
-      new LinearSales(0, 0),
-      new LinearSales(1, 25),
-      new LinearSales(2, 75),
-      new LinearSales(3, 75),
-      new LinearSales(4, 100),
-      new LinearSales(5, 50),
-      new LinearSales(6, 75),
-    ];
-
-    List<Series<LinearSales, int>> chartData = [
-
-      Series<LinearSales, int>(
-        id: 'Desktop',
-        colorFn: (_, __) => MaterialPalette.blue.shadeDefault,
-        domainFn: (LinearSales sales, _) => sales.year,
-        measureFn: (LinearSales sales, _) => sales.sales,
-        data: myFakeDesktopData,
-        fillColorFn: (_, __) => MaterialPalette.green.shadeDefault,
-        radiusPxFn: (_, __) => 3
-      )
-    ];
-
-
-    return Scaffold(
-      
-      appBar: PreferredSize(
-        preferredSize: Size(0, 40),
-        child: AppBar(
-
-          title: Text(
-            '$nickname\'s Profile',
-            style: TextStyle(fontWeight: FontWeight.w500)
-          ),
+    if (GlobalState.userPostDataList.length == 0){
+      return Container(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          'No Posts',
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            fontSize: 16
+          )
         ),
+      );
+    }
+    return Expanded(
+      child: ListView(
+        children: <Widget>[
+
+          Text('hahah'),
+
+
+        ],
       ),
-
-      body: Container(
-
-        padding: const EdgeInsets.all(20),
-
-        child: Center(
-
-          child: Column(
-          
-            crossAxisAlignment: CrossAxisAlignment.center,
-            //mainAxisAlignment: MainAxisAlignment.center,
-            
-            children: <Widget>[
-
-              Stack(
-                children: <Widget>[
-
-                  Container(
-                    height: 130,
-                    child: LineChart(
-                      chartData, 
-                      animate: chartAnimated, 
-                      defaultRenderer: LineRendererConfig(includePoints: true), 
-                      domainAxis: NumericAxisSpec(
-                        showAxisLine: true, 
-                        renderSpec: NoneRenderSpec()
-                      ),
-                    )
-                  ),
-                  
-
-                  Positioned (
-                    
-                    child: Align(
-                      alignment: Alignment.bottomCenter,
-                      heightFactor: 1.8,
-                      child: Column(
-                        children: <Widget>[
-                          CircleAvatar(
-                            backgroundImage: NetworkImage(photoURL),
-                            radius: 48,
-                          ),
-                          Padding(padding: const EdgeInsets.symmetric(vertical: 6),),
-                          Text(
-                                '$nickname',
-                                style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)
-                              ),
-
-                        ]
-                      )
-                    )
-                  ),
-                ],
-              ),
-
-              Divider(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  
-                  buildFriendOperationWidget()
-                ]
-              ),
-   
-
-            ]
-          ),
-        ),
-      ) 
     );
   }
 
+  Widget _buildGiftStand(){
+    return Container(
+      padding: const EdgeInsets.all(8.0),
+      child: Text(
+        'No Gift Stand',
+        style: TextStyle(
+          fontWeight: FontWeight.w700,
+          fontSize: 16
+        )
+      ),
+    );
+  }
 
-
-  
 }
 
-
-
-
-
-class LinearSales {
-  final int year;
-  final int sales;
-
-  LinearSales(this.year, this.sales);
-}
 

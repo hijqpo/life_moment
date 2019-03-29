@@ -5,13 +5,15 @@ import 'package:life_moment/state.dart';
 
 class OperationResponse {
 
-  OperationResponse(this.code, this.isError, this.message);
+  OperationResponse(this.code, this.isError, this.message, {this.data});
 
   static OperationResponse ok = OperationResponse(0, false, 'OK');
 
   final int code;
   final bool isError;
   final String message;
+  final dynamic data;
+
 
   @override
   String toString(){
@@ -25,10 +27,7 @@ class UserProfile {
   static String defaultNickname = 'Anonymous';
   static String defaultAvatarURL = 'https://firebasestorage.googleapis.com/v0/b/life-moment-89403.appspot.com/o/profile_pics%2Favatar.png?alt=media&token=da395a0e-7e14-4b00-bb90-86e3aa7e5474';
 
-  static final Map<String, UserProfile> _cache = {};
-
-
-  static UserProfile createFormDataMap({@required Map<dynamic, dynamic> dataMap}){
+  static UserProfile createFromDataMap({@required Map<dynamic, dynamic> dataMap}){
 
     var friendStatus = dataMap['friendStatus'];
     if (friendStatus == null || friendStatus is! String){
@@ -55,20 +54,11 @@ class UserProfile {
       postCount: dataMap['postCount'] == null ? 0 : dataMap['postCount'],
       friendCount: dataMap['friendCount'] == null ? 0 : dataMap['friendCount'],
       score: dataMap['score'] == null ? 0 : dataMap['score'],
+      gold: dataMap['gold'] == null ? 0 : dataMap['gold'],
 
       relationship: RelationshipData(score: friendScore, status: friendStatus),
     );
   }
-
-  // UserProfile({Map<String, dynamic> dataMap}){
-
-  //   String uidKey = dataMap['uid'];
-
-  //     final UserProfile instanceUserProfile = UserProfile.createFormDataMap(dataMap: dataMap);
-  //     _cache[uidKey] = instanceUserProfile;
-  //     return instanceUserProfile;
-    
-  // }
 
   UserProfile._internal({
     @required this.documentID, 
@@ -81,6 +71,7 @@ class UserProfile {
     this.postCount,
     this.friendCount,
     this.score,
+    this.gold,
     this.relationship,
   });
 
@@ -96,9 +87,17 @@ class UserProfile {
   int postCount;
   int friendCount;
   int score;
+  int gold;
 
   RelationshipData relationship;
 
   String uid;
   String documentID;
+
+  @override
+  String toString(){
+
+    return '{nickname: $nickname, email: $email, gender: $gender, tel: $tel, avatarURL: $avatarURL, ' +
+    'postCount: $postCount, friendCount: $friendCount, score: $score, gold: $gold, uid: $uid, documentID: $documentID';
+  }
 }

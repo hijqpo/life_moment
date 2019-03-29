@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:life_moment/services/stream_widget.dart';
+import 'package:life_moment/views/app_views/base_view.dart';
+import 'package:life_moment/views/structure.dart';
 
 
 
@@ -24,7 +26,9 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         fontFamily: 'Gilroy'
       ),
-      home: StreamWidget.streamStructure(),
+
+      //home: StreamWidget.streamStructure(),
+      home: AppStructure(),
     );
   }
 }

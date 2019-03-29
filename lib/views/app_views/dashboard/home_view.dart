@@ -5,6 +5,8 @@ import 'package:life_moment/factories.dart';
 import 'package:life_moment/services/post_management.dart';
 import 'package:life_moment/state.dart';
 import 'package:life_moment/views/new_post_view.dart';
+import 'package:life_moment/views/structure.dart';
+import 'package:life_moment/widgets/error_text.dart';
 
 // Widget
 import 'package:life_moment/widgets/router_widgets.dart';
@@ -21,39 +23,73 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView>{
 
-  // _HomeViewState(){
-  //   onRefresh();
-  // }
+  // State variable
+  String _errorMessage = '';
+  bool _loading = false;
+
 
   @override
   void initState(){
     super.initState();
-    // onRefresh();
     debugPrint('Home View Initializing...');
   }
 
-  // @override
-  // void didUpdateWidget(HomeView oldWidget) {
-  //   // TODO: implement didUpdateWidget
-  //   super.didUpdateWidget(oldWidget);
-  //   //if (oldWidget.)
-  //   onRefresh();
-  //   debugPrint('haha');
-
-  // }
-
-
-  void onNewPostPressed(){
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (GlobalState.isNewsFeedDataEmpty()){
+      initialRefresh();
+    }
+  }
+ 
+  void _onNewPostPressed(){
     Navigator.push(context, SlidePageRoute(widget: NewPostView(), offset: SlideDirection.up));
+  }
+
+  Future<void> initialRefresh() async{
+
+    if (this.mounted){
+      setState(() {
+        _loading = true;
+      });
+    }
+    OperationResponse response = await PostManagement.loadNewsFeed();
+
+    if (response.isError && this.mounted){
+      setState(() {
+        _loading = false;
+        _errorMessage = response.message;
+      });
+    }
+    else{
+
+      if (this.mounted) {
+        setState(() {
+          _loading = false;
+          _errorMessage = '';
+        });
+      }
+    }
   }
 
   Future<void> onRefresh() async{
 
-    OperationResponse response = await PostManagement.loadNewsFeed();
-    setState(() {
+    if (!_loading){
+      OperationResponse response = await PostManagement.loadNewsFeed();
+      if (response.isError && this.mounted){
+        setState(() {
+          _loading = false;
+          _errorMessage = response.message;
+        });
+      }
+      else{
+        setState(() {
+          _loading = false;
+          _errorMessage = '';
+        });
+      }
       debugPrint('[Home View] Refreshed');
-      //GlobalState.newsFeedDataList.add(NewsFeedData(postTime: DateTime.now()));
-    });
+    }
   }
 
   @override
@@ -65,6 +101,12 @@ class _HomeViewState extends State<HomeView>{
         children: <Widget>[
           // New post bar
           _buildNewPostBar(),
+
+          // Messages
+          _buildErrorText(_errorMessage),
+          _buildLoadingText(),
+
+          // Render list
           _buildNewsFeedList(),
         ]
       ),
@@ -79,7 +121,7 @@ class _HomeViewState extends State<HomeView>{
 
     return FlatButton(
 
-      onPressed: onNewPostPressed,
+      onPressed: _onNewPostPressed,
       padding: const EdgeInsets.all(0),
       child: Container(
           
@@ -129,5 +171,26 @@ class _HomeViewState extends State<HomeView>{
     );
   }
 
-}
+  Widget _buildLoadingText(){
 
+    if (_loading){
+      return Container(
+        padding: const EdgeInsets.all(12.0),
+        child: Text(
+          'Fetching Newsfeeds...',
+          style: TextStyle(
+            //color: Colors.red,
+            fontSize: 16.0,
+            fontWeight: FontWeight.w600
+          )
+        )
+      );
+    }
+    return Container();
+  }
+
+  Widget _buildErrorText(String message){
+
+    return ErrorText(message);
+  }
+}

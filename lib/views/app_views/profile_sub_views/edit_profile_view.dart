@@ -10,6 +10,7 @@ import 'package:life_moment/services/auth_management.dart';
 import 'package:life_moment/services/user_management.dart';
 
 import 'package:life_moment/state.dart';
+import 'package:life_moment/views/structure.dart';
 import 'package:life_moment/widgets/loading_modal.dart';
 
 
@@ -21,18 +22,41 @@ class EditProfileView extends StatefulWidget {
 
 class _EditProfileViewState extends State<EditProfileView> {
 
-  _EditProfileViewState(){
-
-    _nicknameFieldController.text = GlobalState.userProfile.nickname;
-  }
 
   final _nicknameFieldController = TextEditingController();
 
+  String _originalNickname = '';
 
   String _errorMessage = '';
   File _avatarImage;
   bool _showNewAvatarImage = false;
   bool _dirty = false;
+
+  UserProfile _userProfile;
+
+  // @override
+  // void didChangeDependencies() {
+  //   super.didChangeDependencies();
+  //   //  _originalNickname = AppContext.of(context).userProfile.nickname;
+  //   // _nicknameFieldController.text = _originalNickname;
+  //   debugPrint('hello');
+  //   // debugPrint(AppContext.of(widget.context).toString());
+  //   // _userProfile = AppContext.of(widget.context).userProfile;
+  //   _userProfile = GlobalState.userProfile;
+  //   _originalNickname = _userProfile.nickname;
+  //   _nicknameFieldController.text = _originalNickname;
+  // }
+
+  @override
+  void initState(){
+    super.initState();
+    _userProfile = GlobalState.userProfile;
+    _originalNickname = _userProfile.nickname;
+    _nicknameFieldController.text = _originalNickname;
+
+  }
+
+
 
   Future<void> _onDonePressed() async{
     debugPrint('[Edit Profile View] Done is pressed');
@@ -45,7 +69,7 @@ class _EditProfileViewState extends State<EditProfileView> {
       );
 
       var newNickname;
-      if (_nicknameFieldController.text != GlobalState.userProfile.nickname){
+      if (_nicknameFieldController.text != _originalNickname){
         newNickname = _nicknameFieldController.text;
       }
 
@@ -90,7 +114,7 @@ class _EditProfileViewState extends State<EditProfileView> {
   @override
   Widget build(BuildContext context) {
 
-    UserProfile profile = GlobalState.userProfile;
+    // UserProfile profile = GlobalState.userProfile;
 
     return Scaffold(
         
@@ -128,7 +152,7 @@ class _EditProfileViewState extends State<EditProfileView> {
 
             _buildErrorMessageSection(),
 
-            _buildAvatarSection(profile),
+            _buildAvatarSection(_userProfile),
 
             _buildNicknameField(),
             // Divider(height: 0,),

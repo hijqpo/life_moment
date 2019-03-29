@@ -31,7 +31,9 @@ class _SearchResultCellState extends State<SearchResultCell> {
 
     String photoURL = data.avatarURL == null ? UserProfile.defaultAvatarURL : data.avatarURL;
     String nickname = data.nickname == null ? '' : data.nickname;
+    String score = data.score == null ? '0' : data.score.toString();
     // String nickname = data.nickname == null ? '' : data.nickname;
+    String status = data.relationship == null ? 'Stranger' : data.relationship.status;
 
     return Container(
       
@@ -50,12 +52,48 @@ class _SearchResultCellState extends State<SearchResultCell> {
                   backgroundImage: NetworkImage(photoURL)
                 ),
                 title: Text('$nickname'),
+                subtitle: Text('Score: $score'),
+                trailing: _buildRelationshipText(status)
               )
             ],
           ),
         )
       )
 
+    );
+  }
+
+  Widget _buildRelationshipText(String status){
+
+    switch (status){
+
+      case 'stranger':
+        status = 'Stranger';
+        break;
+
+      case 'sent_request':
+        status = 'Sent Friend Request';
+        break;
+
+      case 'received_request':
+        status = '???';
+        break;
+
+      case 'friend':
+        status = 'Friend';
+        break;
+
+      default:
+        status = 'Stranger';
+        break;
+    }
+
+    return Text(
+      '$status',
+      style: TextStyle(
+        color: Colors.blue,
+        fontWeight: FontWeight.w600
+      )
     );
   }
 }

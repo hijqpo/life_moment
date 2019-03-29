@@ -88,6 +88,34 @@ class NewsFeedData {
       postOwnerDocumentID = '';
     }
 
+    List<CommentData> recentComments = [];
+    var recentCommentData = dataMap['recentComments'];
+    if (recentCommentData == null || recentCommentData is! List){
+      debugPrint('[NewsFeedData] Cannot read recentComments from the given dataMap, set to default value');
+    }
+    else{
+      List.castFrom(recentCommentData).forEach((d){
+
+        // debugPrint('${d['uid']}');
+        // debugPrint('${d['comment']}');
+        // debugPrint('${d['nickname']}');
+        // debugPrint('${d['avatarURL']}');
+        // debugPrint('${d['time']}');
+
+        DateTime instanceTime = Timestamp(d['time']['_seconds'], d['time']['_nanoseconds']).toDate();
+
+        recentComments.add(
+          CommentData(
+            uid: d['uid'],
+            comment: d['comment'],
+            nickname: d['nickname'],
+            avatarURL: d['avatarURL'],
+            time: instanceTime,
+          )
+        );
+      });
+    }
+
     return NewsFeedData._internal(
 
       uid: uid,
@@ -102,6 +130,7 @@ class NewsFeedData {
       commentCount: commentCount,
       postDocumentID: postDocumentID,
       postOwnerDocumentID: postOwnerDocumentID,
+      recentComments: recentComments,
     );
   }
 
@@ -131,6 +160,7 @@ class NewsFeedData {
       commentCount: 0,
       postDocumentID: '',
       postOwnerDocumentID: userProfile.documentID,
+      recentComments: [],
     );
   }
 
@@ -146,7 +176,8 @@ class NewsFeedData {
     this.supportCount, 
     this.commentCount, 
     this.postDocumentID, 
-    this.postOwnerDocumentID
+    this.postOwnerDocumentID,
+    this.recentComments
   });
 
   final String uid;
@@ -164,6 +195,8 @@ class NewsFeedData {
 
   final String postDocumentID;
   final String postOwnerDocumentID;
+
+  final List<CommentData> recentComments;
 }
 
 class PostData {
@@ -173,4 +206,16 @@ class PostData {
   Mood mood;
   String postID;
   String description;
+}
+
+class CommentData {
+
+  CommentData({this.uid, this.comment, this.avatarURL, this.nickname, this.time});
+
+  String uid;
+  String comment;
+  String nickname;
+  String avatarURL;
+  DateTime time;
+
 }

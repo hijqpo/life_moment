@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:life_moment/data_structures/mood_data.dart';
 import 'package:life_moment/data_structures/news_feed_data.dart';
 import 'package:life_moment/data_structures/system_data.dart';
+import 'package:life_moment/forms/form_widgets/emotion_tag.dart';
 import 'package:life_moment/forms/form_widgets/form_section.dart';
 import 'package:life_moment/services/post_management.dart';
 import 'package:life_moment/state.dart';
@@ -26,6 +27,9 @@ class NewPostFormState extends State<NewPostForm> {
 
   String _failSubmitPostMessage = '';
   String _emptyMoodWarningMessage = '';
+
+  List<String> _selectableEmotion = [];
+  List<String> _selectedEmotion = [];
 
   Mood _currentMood = Mood();
 
@@ -68,6 +72,20 @@ class NewPostFormState extends State<NewPostForm> {
     if (_descriptionFieldFocusNode.hasFocus){
       _descriptionFieldFocusNode.unfocus();
     }
+  }
+
+  void onEmotionTagSelected(String val){
+
+  }
+
+  void onEmotionTagUnselected(String val){
+
+    if (_selectedEmotion.contains(val)){
+      _selectedEmotion.remove(val);
+    }
+
+
+
   }
 
   void onSubmit() async{
@@ -139,6 +157,8 @@ class NewPostFormState extends State<NewPostForm> {
 
           _buildIntensitySelectionSection(),
 
+          _buildEmotionSelectionSection(),
+
           _buildDescriptionSection(),
 
         ],
@@ -159,6 +179,7 @@ class NewPostFormState extends State<NewPostForm> {
       ]
     );
   }
+
 
   Widget _buildProfileSection(){
 
@@ -294,6 +315,55 @@ class NewPostFormState extends State<NewPostForm> {
           value: _currentMood.intensity.toDouble(),
         )
       ],  
+    );
+  }
+
+  Widget _buildEmotionSelectionSection(){
+
+    //List<Emotion> emotionList = Emotion.fromListFromMood(_currentMood);
+    List<String> emotionList = ['A emotion', 'Angey', 'Want Fuck', 'Sad', 'Depressed'];
+
+    return FormSection(
+
+      children: <Widget>[
+
+        Container(
+          margin: EdgeInsets.only(bottom: 8),
+          child: Text(
+            'Add emotions',
+            style: TextStyle(
+              fontWeight: FontWeight.w500,
+            )
+          ),
+        ),
+
+        Container(
+          height: 50,
+          child: ListView(
+            
+            scrollDirection: Axis.horizontal,
+            children: <Widget>[
+              EmotionTag('SomeWordLL'),
+              EmotionTag('SomeWordLL'),
+              EmotionTag('SomeWordLL'),
+              EmotionTag('SomeWordLL'),
+              EmotionTag('SomeWordLL'),
+              EmotionTag('SomeWordLL'),
+              EmotionTag('SomeWordLL'),
+              EmotionTag('SomeWordLL'),
+              EmotionTag('SomeWordLL'),
+              EmotionTag('SomeWordLL'),
+              EmotionTag('SomeWordLL'),
+              EmotionTag('SomeWordLL'),
+              EmotionTag('SomeWordLL'),
+              EmotionTag('SomeWordLL'),
+              EmotionTag('SomeWordLL'),
+              EmotionTag('SomeWordLL'),
+            ],  
+          ),
+        )
+        
+      ],
     );
   }
 

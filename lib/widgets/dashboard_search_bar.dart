@@ -24,6 +24,14 @@ class DashboardSearchBar extends StatefulWidget {
 class _DashboardSearchBarState extends State<DashboardSearchBar> {
 
   final _searchFieldController = TextEditingController();
+  final _focusNode = FocusNode();
+
+  _DashboardSearchBarState(){
+    // if (widget.searchable){
+    //   FocusScope.of(context).autofocus(_focusNode);
+    // }
+    //
+  }
 
   void onPressed(){
 
@@ -61,6 +69,7 @@ class _DashboardSearchBarState extends State<DashboardSearchBar> {
           
           controller: _searchFieldController,
           enabled: widget.searchable,
+          focusNode: _focusNode,
           decoration: InputDecoration(
             contentPadding: const EdgeInsets.only(top:4),
             border: InputBorder.none,

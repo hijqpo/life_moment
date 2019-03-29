@@ -104,6 +104,7 @@ class AuthManagement {
           'postCount': 0,
           'friendCount': 0,
           'score': 0,
+          'gold': 0,
           'educations': [],
           'avatarURL': UserProfile.defaultAvatarURL
         });

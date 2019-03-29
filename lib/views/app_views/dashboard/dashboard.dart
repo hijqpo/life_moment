@@ -4,13 +4,16 @@ import 'package:life_moment/services/auth_management.dart';
 import 'package:life_moment/services/stream_widget.dart';
 import 'package:life_moment/services/user_management.dart';
 import 'package:life_moment/state.dart';
+import 'package:life_moment/views/app_views/notification_view.dart';
+import 'package:life_moment/views/app_views/profile_sub_views/user_friend_view.dart';
 import 'package:life_moment/views/friend_profile_view.dart';
 import 'dart:async';
 
 // Views
-import 'package:life_moment/views/home_view.dart';
+import 'package:life_moment/views/app_views/dashboard/home_view.dart';
 import 'package:life_moment/views/chart_view.dart';
-import 'package:life_moment/views/profile_view.dart';
+import 'package:life_moment/views/app_views/dashboard/profile_view.dart';
+import 'package:life_moment/widgets/app_bars/app_bar_builder.dart';
 import 'package:life_moment/widgets/dashboard_search_bar.dart';
 import 'package:life_moment/views/map_view.dart';
 
@@ -29,7 +32,6 @@ class Dashboard extends StatefulWidget {
     return new _DashboardState();
   }
 }
-
 
 
 class _DashboardState extends State<Dashboard> {
@@ -58,65 +60,23 @@ class _DashboardState extends State<Dashboard> {
   }
 
 
+  void _onNotificationPressed(){
+    Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => NotificationView()));
+  }
+
   @override
   Widget build(BuildContext context) {
   
+    int notificationCount = GlobalState.notificationCount;
+
     return Scaffold(
 
-      appBar: PreferredSize(
-        preferredSize: Size(0, 40),
-        child:  AppBar(
-          title: DashboardSearchBar(),
+      appBar: AppBarBuilder.dashboardAppBar(_onNotificationPressed, notificationCount),
 
-          // leading: IconButton(
-          //   icon: Icon(
-          //     FontAwesomeIcons.signOutAlt,
-          //     size: 20,  
-          //   ),
-          //   tooltip: 'Sign out',
-          //   onPressed: AuthManagement.signOut,
-          // ),
-
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.notifications),
-              tooltip: 'Notifications',
-              onPressed: (){},
-            )
-          ],
-        )
-      ),
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex)
       ),
-      // body: Center(
-      //   child: Stack(
-      //     children: <Widget>[
-      //       Offstage(
-      //         offstage: _selectedIndex != 0,
-      //         child: HomeView()
-      //       ),
-      //       Offstage(
-      //         offstage: _selectedIndex != 1,
-      //         child: Text('Index 1: ??????'),
-      //       ),
-      //       Offstage(
-      //         offstage: _selectedIndex != 2,
-      //         child: Text('Index 2: Life Moment'),
-      //       ),
-      //       Offstage(
-      //         offstage: _selectedIndex != 3,
-      //         child: ChartView(),
-      //       ),
-      //       Offstage(
-      //         offstage: _selectedIndex != 4,
-      //         child: ProfileView(),
-      //       ),
-
-      //     ]
-      //   ),
-      // ),
-
+      
       bottomNavigationBar: Theme(
         data: Theme.of(context).copyWith(
           canvasColor: Colors.orangeAccent

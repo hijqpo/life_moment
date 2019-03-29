@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:life_moment/data_structures/mood_data.dart';
+import 'package:life_moment/data_structures/news_feed_data.dart';
 
 // System
 import 'package:life_moment/data_structures/system_data.dart';
@@ -35,7 +37,7 @@ class UserManagement {
 
       searchResutls.forEach((data) {
         
-        UserProfile profile = UserProfile.createFormDataMap(dataMap: data);
+        UserProfile profile = UserProfile.createFromDataMap(dataMap: data);
 
         GlobalState.appendSearchResult(profile);
       });
@@ -111,10 +113,81 @@ class UserManagement {
       debugPrint(error.toString());
       return OperationResponse(104, true, error.toString());
     }
-
-
   }
 
+  static Future<OperationResponse> loadUserPostsAndMoods({@required String uid}) async{
+
+    try {
+
+      List<dynamic> postResult = await CloudFunctions.instance.call(
+        functionName: 'loadUserPosts',
+        parameters: {
+          'uid': uid
+        }
+      );
+      debugPrint('${postResult.last}');
+      List<dynamic> posts = postResult.first;
+
+      posts.forEach((p){
+
+        NewsFeedData instanceData = NewsFeedData.createFromDataMap(dataMap: p);
+        GlobalState.updateUserPostDataList(instanceData);
+      });
+
+
+      List<dynamic> moodResult = await CloudFunctions.instance.call(
+        functionName: 'loadUserMoods',
+        parameters: {
+          'uid': uid
+        }
+      );
+      debugPrint('${moodResult.last}');
+      List<dynamic> moods = moodResult.first;
+
+      List<MoodChartData> moodList = [];
+      moods.forEach((m){
+
+        MoodChartData instanceData = MoodChartData(m['time'], m['moodType'], m['moodIntensity']);
+        moodList.add(instanceData);
+      });
+      GlobalState.moodChartData = moodList;
+
+      return OperationResponse(20, false, 'Success');
+    }
+    catch(error){
+      debugPrint(error.toString());
+      return OperationResponse(104, true, error.toString());
+    }
+  }
+
+  static Future<OperationResponse> loadUserMood(String uid) async{
+
+    try {
+      List<dynamic> moodResult = await CloudFunctions.instance.call(
+          functionName: 'loadUserMoods',
+          parameters: {
+            'uid': uid
+          }
+        );
+        debugPrint('${moodResult.last}');
+        List<dynamic> moods = moodResult.first;
+
+        List<MoodChartData> moodList = [];
+        moods.forEach((m){
+
+          DateTime instanceDateTime = Timestamp(m['time']['_seconds'], m['time']['_nanoseconds']).toDate();
+
+          MoodChartData instanceData = MoodChartData(instanceDateTime, m['moodType'], m['moodIntensity']);
+          moodList.add(instanceData);
+        });
+
+        return OperationResponse(20, false, 'Success', data: moodList);
+    }
+    catch(error){
+      debugPrint(error.toString());
+      return OperationResponse(104, true, error.toString());
+    }
+  }
 
 }
 

@@ -1,7 +1,8 @@
 #include "AppDelegate.h"
 #include "GeneratedPluginRegistrant.h"
-@import Firebase;
 #import "GoogleMaps/GoogleMaps.h"
+@import Firebase;
+
 
 @implementation AppDelegate
 

@@ -61,7 +61,7 @@ class PostManagement {
       // Last element of result is operation messages
       debugPrint(result.last);
       
-      // Fetch the post data from result
+      // // Fetch the post data from result
       List<dynamic> postData = result.first;
 
       postData.forEach((data) {
@@ -71,7 +71,7 @@ class PostManagement {
         GlobalState.updateNewsFeedDataList(instanceNewsFeedData);
       });
 
-      return OperationResponse(20, false, 'Success');
+      return OperationResponse(20, false, 'Success', data: result.first);
     }
     catch(error){
       debugPrint(error.toString());
@@ -79,9 +79,9 @@ class PostManagement {
     }
   }
 
-  static Future<OperationResponse> supportPost({@required String postDocumentID}) async {
+  static Future<OperationResponse> supportPost(UserProfile userProfile, {@required String postDocumentID}) async {
 
-    String uid = GlobalState.userProfile.uid;
+    String uid = userProfile.uid;
 
     try{
 
@@ -97,8 +97,33 @@ class PostManagement {
 
     }
     catch(error){
-      debugPrint(error.messages);
+      debugPrint(error.message);
       return OperationResponse(104, true, error.toString());
     }
   }
+
+  static Future<OperationResponse> commentPost(String uid, String comment, String postDocumentID) async{
+
+    try {
+
+      List<dynamic> result = await CloudFunctions.instance.call(
+        functionName: 'commentPost',
+        parameters: {
+          'uid': uid,
+          'comment': comment,
+          'postDocumentID': postDocumentID,
+        }
+      );
+
+      debugPrint('${result.last}');
+      return OperationResponse(20, false, 'Success');
+    }
+    catch(error){
+      debugPrint(error.message);
+      return OperationResponse(104, true, error.toString());
+    }
+
+  }
+
+
 }

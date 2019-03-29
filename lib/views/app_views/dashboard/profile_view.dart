@@ -2,12 +2,18 @@ import 'package:charts_flutter/flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:life_moment/data_structures/friend_data.dart';
+import 'package:life_moment/data_structures/mood_data.dart';
 import 'package:life_moment/data_structures/system_data.dart';
 import 'package:life_moment/services/auth_management.dart';
 import 'package:life_moment/services/user_management.dart';
 
 import 'package:life_moment/state.dart';
-import 'package:life_moment/views/edit_profile_view.dart';
+import 'package:life_moment/views/app_views/profile_sub_views/edit_profile_view.dart';
+import 'package:life_moment/views/app_views/profile_sub_views/user_friend_view.dart';
+import 'package:life_moment/views/app_views/profile_sub_views/user_post_view.dart';
+
+import 'package:life_moment/views/structure.dart';
+import 'package:life_moment/widgets/charts/mood_progress.dart';
 
 
 class ProfileView extends StatefulWidget {
@@ -18,9 +24,53 @@ class ProfileView extends StatefulWidget {
 
 class _ProfileViewState extends State<ProfileView> {
 
-  bool chartAnimated = true;
+  bool _chartAnimated = true;
   RelationshipStatus currentRelationshipStatus;
 
+
+  String _errorMessage = '';
+
+  bool _moodLoading = true;
+  List<MoodChartData> _moodData;
+
+  UserProfile _userProfile;
+
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _userProfile = GlobalState.userProfile;
+    _initialRefresh();
+  }
+
+  Future<void> _initialRefresh() async {
+
+    if (this.mounted){
+      setState(() {
+        _moodLoading = true;
+      });
+    }
+
+    OperationResponse response = await UserManagement.loadUserMood(_userProfile.uid);
+
+    if (response.isError && this.mounted){
+
+      setState(() {
+        _moodLoading = false;
+        _errorMessage = response.message;
+      });
+    }
+    else{
+
+      if (this.mounted) {
+        setState(() {
+          _moodLoading = false;
+          _errorMessage = '';
+          _moodData = response.data;
+        });
+      }
+    }
+  }
 
   void _onSignOutPressed(){
 
@@ -29,6 +79,16 @@ class _ProfileViewState extends State<ProfileView> {
 
   void _onEditProfilePressed(){
     Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => EditProfileView()));
+  
+    //Navigator.of(context).pu
+  }
+
+  void _onPostsPressed(){
+    Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => UserPostView(_userProfile)));
+  }
+
+  void _onFriendsPressed(){
+    Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => UserFriendView(_userProfile)));
   }
 
   Future<void> _onRefresh(){
@@ -75,62 +135,34 @@ class _ProfileViewState extends State<ProfileView> {
 
   Widget _buildMoodChart(){
 
-    final myFakeDesktopData = [
-      new LinearSales(0, 0),
-      new LinearSales(1, 25),
-      new LinearSales(2, 75),
-      new LinearSales(3, 75),
-      new LinearSales(4, 100),
-      new LinearSales(5, 50),
-      new LinearSales(6, 75),
-    ];
-
-    List<Series<LinearSales, int>> chartData = [
-
-      Series<LinearSales, int>(
-        id: 'Desktop',
-        colorFn: (_, __) => MaterialPalette.blue.shadeDefault,
-        domainFn: (LinearSales sales, _) => sales.year,
-        measureFn: (LinearSales sales, _) => sales.sales,
-        data: myFakeDesktopData,
-        fillColorFn: (_, __) => MaterialPalette.green.shadeDefault,
-        radiusPxFn: (_, __) => 3
-      )
-    ];
+    Widget chart;
+    if (_moodLoading) {
+      chart = Text('Loading...');
+    }
+    else{
+      chart = MoodProgress(_moodData);
+    }
 
     return ExpansionTile(
 
       title: Text(
         'Mood Progress',
         style: TextStyle(
+          fontSize: 16.0,
           fontWeight: FontWeight.w700
         )
       ),
       children: <Widget>[
-        Container(
-          margin: const EdgeInsets.all(12),
-          height: 120,
-          child: LineChart(
-            chartData, 
-            animate: chartAnimated, 
-            defaultRenderer: LineRendererConfig(includePoints: true), 
-            domainAxis: NumericAxisSpec(
-              showAxisLine: true, 
-              renderSpec: NoneRenderSpec()
-            ),
-          )
-        ),
+        chart
       ],
-
     );
-    
   }
 
   Widget _buildProfile(){
 
     UserProfile profile = GlobalState.userProfile;
-    String _avatarURL = profile.avatarURL;
-    String _nickname = profile.nickname;
+    String avatarURL = profile.avatarURL;
+    String nickname = profile.nickname;
 
     return Container(
 
@@ -143,7 +175,7 @@ class _ProfileViewState extends State<ProfileView> {
           ListTile(
 
             leading: CircleAvatar(
-              backgroundImage: NetworkImage(_avatarURL),
+              backgroundImage: NetworkImage(avatarURL),
               radius: 40,
             ),
 
@@ -158,7 +190,7 @@ class _ProfileViewState extends State<ProfileView> {
           Padding(
             padding: const EdgeInsets.only(left: 16.0, top: 10),
             child: Text(
-              '$_nickname',
+              '$nickname',
               style: TextStyle(
                 fontSize: 24, 
                 fontWeight: FontWeight.w500
@@ -179,16 +211,16 @@ class _ProfileViewState extends State<ProfileView> {
       children: <Widget>[
 
         _buildStatItem(label: 'Friends', count: profile.friendCount.toString()),
-        _buildStatItem(label: 'Posts', count: profile.postCount.toString()),
-        _buildStatItem(label: 'Score', count: profile.score.toString())
+        _buildStatItem(label: 'Posts', count: profile.postCount.toString(), onPressed: _onPostsPressed),
+        _buildStatItem(label: 'Score', count: profile.score.toString(), onPressed: _onFriendsPressed)
       ],
     );
   }
 
-  Widget _buildStatItem({String label, String count}){
+  Widget _buildStatItem({String label, String count, Function() onPressed}){
 
     return FlatButton(
-      onPressed: (){},
+      onPressed: onPressed,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
@@ -283,11 +315,3 @@ class _ProfileViewState extends State<ProfileView> {
     );
   }
 }
-
-class LinearSales {
-  final int year;
-  final int sales;
-
-  LinearSales(this.year, this.sales);
-}
-

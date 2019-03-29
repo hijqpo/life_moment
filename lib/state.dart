@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:life_moment/data_structures/mood_data.dart';
 import 'package:life_moment/data_structures/news_feed_data.dart';
+import 'package:life_moment/data_structures/notification_data.dart';
 
 import 'package:life_moment/data_structures/system_data.dart';
 import 'package:life_moment/forms/signin_form.dart';
@@ -12,6 +14,7 @@ class GlobalState {
   // Stream snapshot
   static AsyncSnapshot<dynamic> authSnapshot;
   static AsyncSnapshot<dynamic> userProfileSnapshot;
+  static AsyncSnapshot<dynamic> notificationSnapshot;
 
     // User Data state
   static FirebaseUser get firebaseUser {
@@ -22,7 +25,30 @@ class GlobalState {
 
     Map<String, dynamic> dataMap = userProfileSnapshot.data.documents[0].data;
     dataMap['documentID'] = userProfileSnapshot.data.documents[0].documentID;
-    return UserProfile.createFormDataMap(dataMap: dataMap);
+    return UserProfile.createFromDataMap(dataMap: dataMap);
+  }
+
+  static List<NotificationData> get notificationList {
+
+    List<NotificationData> list = [];
+
+    List<dynamic> notifications = notificationSnapshot.data.documents;
+    notifications.forEach((n){
+      Map<String, dynamic> dataMap = n.data;
+
+      NotificationData data = NotificationData.createFromDataMap(dataMap);
+
+      list.add(data);
+    });
+    
+    return list;
+  }
+
+  static int get notificationCount {
+    if (notificationSnapshot.hasData){
+      return notificationSnapshot.data.documents.length;
+    }
+    return 0;
   }
 
 
@@ -31,6 +57,14 @@ class GlobalState {
 
   static Map<String, NewsFeedData> _tempNewsFeedDataMap = {};
   static Map<String, NewsFeedData> _newsFeedDataMap = {};
+  static Map<String, NewsFeedData> _userPostDataMap = {};
+
+
+
+  static bool isNewsFeedDataEmpty(){
+
+    return _newsFeedDataMap.isEmpty && _tempNewsFeedDataMap.isEmpty;
+  }
 
   static void updateNewsFeedDataList(NewsFeedData data){
 
@@ -47,6 +81,15 @@ class GlobalState {
     _tempNewsFeedDataMap[postID] = data;
   }
 
+  static void updateUserPostDataList(NewsFeedData data){
+    String postID = data.postID;
+    _userPostDataMap[postID] = data;
+  }
+
+  static void clearUserPostDataList(){
+    _userPostDataMap.clear();
+  }
+
   static List<NewsFeedData> get newsFeedDataList {
     return _newsFeedDataMap.values.toList();
   }
@@ -54,6 +97,17 @@ class GlobalState {
   static List<NewsFeedData> get newsFeedDataTempList {
     return _tempNewsFeedDataMap.values.toList();
   }
+
+  static List<NewsFeedData> get userPostDataList {
+    return _userPostDataMap.values.toList();
+  }
+
+
+
+
+
+  static List<MoodChartData> moodChartData = [];
+
 
 
   static Map<String, UserProfile> _searchResultMap = {};
@@ -87,6 +141,7 @@ class GlobalState {
 
     _newsFeedDataMap.clear();
     _tempNewsFeedDataMap.clear();
+    _userPostDataMap.clear();
     _searchResultMap.clear();
   }
 

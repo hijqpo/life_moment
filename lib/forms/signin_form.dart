@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:life_moment/data_structures/system_data.dart';
 import 'package:life_moment/services/auth_management.dart';
+import 'package:life_moment/views/auth_views/signup_view.dart';
 
-import 'package:life_moment/views/signup_view.dart';
 
 
 
